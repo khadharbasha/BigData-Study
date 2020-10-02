@@ -1,0 +1,63 @@
+To start the Daemons individually ( Useful in multinode cluster setup)
+hadoop-daemons.sh start secondarynamenode
+hadoop-daemons.sh start namenode
+hadoop-daemons.sh start datanode
+yarn-daemon.sh start nodemanager
+yarn-daemon.sh start resourcemanager
+mr-jobhistory-daemon.sh start historyserver
+
+
+
+
+sudo service mysqld start
+mysql -u root -p
+password: root
+use custdb;
+
+
+Hive:
+==================
+Use the below commands to start hive always:
+
+sudo service mysqld start
+hive --service metastore
+
+
+
+
+CREATE external TABLE xml_bank(customer_id STRING, income BIGINT, demographics map<string,string>,
+financial map<string,string>)
+ROW FORMAT SERDE 'com.ibm.spss.hive.serde2.xml.XmlSerDe'
+WITH SERDEPROPERTIES (
+"column.xpath.customer_id"="/record/@customer_id",
+"column.xpath.income"="/record/income/text()",
+"column.xpath.demographics"="/record/demographics/*",
+"column.xpath.financial"="/record/financial/*"
+)
+STORED AS
+INPUTFORMAT 'com.ibm.spss.hive.serde2.xml.XmlInputFormat'
+OUTPUTFORMAT 'org.apache.hadoop.hive.ql.io.IgnoreKeyTextOutputFormat'
+location '/user/hduser/xmlserdebank/'
+TBLPROPERTIES (
+"xmlinput.start"="<record customer",
+"xmlinput.end"="</record>" );
+
+
+CREATE external TABLE xml_bank2(customer_id STRING, income BIGINT, othdebt string)
+ROW FORMAT SERDE 'com.ibm.spss.hive.serde2.xml.XmlSerDe'
+WITH SERDEPROPERTIES (
+"column.xpath.customer_id"="/record/@customer_id",
+"column.xpath.income"="/record/income/text()",
+"column.xpath.othdebt"="/record/financial/othdebt/text()"	
+)
+STORED AS
+INPUTFORMAT 'com.ibm.spss.hive.serde2.xml.XmlInputFormat'
+OUTPUTFORMAT 'org.apache.hadoop.hive.ql.io.IgnoreKeyTextOutputFormat'
+location '/user/hduser/xmlserdebank/'
+TBLPROPERTIES (
+"xmlinput.start"="<record customer",
+"xmlinput.end"="</record>" );
+
+
+
+
