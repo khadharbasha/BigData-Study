@@ -1,0 +1,10 @@
+Interview Questions:
+
+HIVE:
+Q: Can we do DDL operations in HIVE table.
+	In Hive Update and Delete work based on some limitations
+
+    1.It can only be performed on tables that support ACID.
+    2.If a table is to be used in ACID writes (insert, update, delete) then the table property “transactional” must be set on                  that table.
+    3.Only ORC file format is supported in this.
+    4.Tables must be bucketed to make use of these features.

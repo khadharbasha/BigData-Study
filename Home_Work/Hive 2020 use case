@@ -1,0 +1,195 @@
+DDL opetation on HIVE:
+
+create table empdml (
+EmployeeID Int, 
+FirstName String,
+Designation String, 
+Salary Int,
+Department String) 
+clustered by (department) into 3 buckets 
+stored as orc TBLPROPERTIES ('transactional'='true'); 
+
+
+insert into table empdml values(1,'Rohit','MD',88000,'Development'); 
+insert into table empdml values(2,'Arun','NJ',75000,'Testing'); 
+
+ETL on Hive:
+Create database custdb;
+
+use custdb;
+
+create table customer(
+custno string, 
+firstname string,
+lastname string, 
+age int,
+profession string)
+row format delimited 
+fields terminated by ',';
+
+
+
+load data local inpath '/home/hduser/hive/data/custs' into table customer; 
+
+
+denormalising the tables into a single fat table with added ETL operations
+---------------------------------------------------------------------------------
+create external table cust_trxn (
+custno int,
+fullname string,
+age int,
+profession string,
+amount double,
+product string,
+spendby string,
+agecat varchar(100),
+modifiedamout float)
+row format delimited 
+fields terminated by ',' 
+location '/user/hduser/custtxns';
+
+
+insert into table cust_trxn 
+select a.custno,
+upper(concat(a.firstname,a.lastname)),
+a.age,
+a.profession,
+b.amount,
+b.product,
+b.spendby,
+case when age < 30 then 'low' 
+when age >= 30 and age < 50 then 'middle'
+when age >= 50 then 'old'
+else 'others'
+end as agecat,
+case when spendby='credit' then b.amount+(b.amount*0.05) 
+else b.amount 
+end as modifiedamount
+from custdb.customer a JOIN retail.txnrecords b
+ON a.custno = b.custno; 
+
+
+Creating aggregation tables
+------------------------------
+create external table cust_trxn_aggr (
+seqno int,
+product string,
+profession string,
+level string,
+sumamt double,
+avgamount double,
+maxamt double,
+avgage int,
+currentdate date)
+row format delimited fields terminated by ',';
+
+
+insert overwrite table cust_trxn_aggr
+select row_number() over(),
+product,
+profession, 
+agecat, 
+sum(amount),
+avg(amount),
+max(amount),
+avg(age),
+current_date()
+from cust_trxn
+group by product,profession,agecat,current_date(); 
+
+
+
+Benchmarking Hive using different file format storage: 
+---------------------------------------------------------------
+The purpose of doing benchmarking is to identify the best functionality or 
+the feature to be used by iterating with different options, 
+here we are going to create textfile, orc and parquet format tables to check the performance between all these tables and the data size it occupied.
+
+Text file:
+-------------------
+create table staging_txn(
+txnno INT,
+txndate STRING,
+custno INT,
+amount DOUBLE,
+category STRING,
+product STRING,
+city STRING,
+state STRING,
+spendby STRING) 
+row format delimited 
+fields terminated by ',' 
+lines terminated by '\n' 
+stored as textfile; 
+
+LOAD DATA LOCAL INPATH '/home/hduser/hive/data/txns' OVERWRITE INTO TABLE staging_txn; 
+
+parquetfile
+------------------
+create table txn_parquet(
+txnno INT,
+txndate STRING,
+custno INT,
+amount DOUBLE,
+category STRING,
+product STRING,
+city STRING,
+state STRING,
+spendby STRING) 
+row format delimited 
+fields terminated by ',' 
+lines terminated by '\n' 
+stored as parquetfile; 
+
+Insert into table txn_parquet select txnno,txndate,custno,amount,category, product,city,state,spendby from staging_txn; 
+
+ORC file:
+--------------
+create table txn_orc(
+txnno INT,
+txndate STRING,
+custno INT,
+amount DOUBLE,
+category STRING,
+product STRING,
+city STRING,
+state STRING,
+spendby STRING) 
+row format delimited 
+fields terminated by ',' 
+lines terminated by '\n' 
+stored as orcfile; 
+
+Insert into table txn_orc select txnno,txndate,custno,amount,category, product,city,state,spendby from staging_txn; 
+
+=======================================================
+Size Comparision: 
+=======================================================
+Text file ==> staging_txn
+drwxr-xr-x   - hduser supergroup          0 2020-10-14 19:09 /user/hive/warehouse/custdb.db/staging_txn
+-rw-r--r--   1 hduser supergroup    8472073 2020-10-14 19:09 /user/hive/warehouse/custdb.db/staging_txn/txns
+
+ORC ==> txn_orc
+drwxr-xr-x   - hduser supergroup          0 2020-10-14 19:17 /user/hive/warehouse/custdb.db/txn_orc
+-rw-r--r--   1 hduser supergroup     966094 2020-10-14 19:17 /user/hive/warehouse/custdb.db/txn_orc/000000_0
+
+Parquet ==> txn_parquet
+drwxr-xr-x   - hduser supergroup          0 2020-10-14 19:16 /user/hive/warehouse/custdb.db/txn_parquet
+-rw-r--r--   1 hduser supergroup    1344415 2020-10-14 19:16 /user/hive/warehouse/custdb.db/txn_parquet/000000_0
+
+ORC == WINS
+
+select count(txnno),category from staging_txn group by category; 
+
+=======================================================
+Time comparision
+=======================================================
+select count(txnno),category from staging_txn group by category; 	==> Time taken: 29.155 seconds, Fetched: 15 row(s), MapReduce Total cumulative CPU time: 5 seconds 920 msec
+select count(txnno),category from txn_orc group by category; 		==> Time taken: 31.236 seconds, Fetched: 15 row(s), MapReduce Total cumulative CPU time: 4 seconds 200 msec
+select count(txnno),category from txn_parquet group by category; 	==> Time taken: 23.448 seconds, Fetched: 15 row(s), MapReduce Total cumulative CPU time: 8 seconds 720 msec
+
+
+2nd round:
+select count(txnno),category from staging_txn group by category; 	==> Time taken: 21.407 seconds, Fetched: 15 row(s), MapReduce Total cumulative CPU time: 3 seconds 870 msec
+select count(txnno),category from txn_orc group by category;		==> Time taken: 25.982 seconds, Fetched: 15 row(s), MapReduce Total cumulative CPU time: 3 seconds 520 msec 
+select count(txnno),category from txn_parquet group by category;	==> Time taken: 22.198 seconds, Fetched: 15 row(s), MapReduce Total cumulative CPU time: 6 seconds 560 msec
