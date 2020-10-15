@@ -193,3 +193,404 @@ select count(txnno),category from txn_parquet group by category; 	==> Time taken
 select count(txnno),category from staging_txn group by category; 	==> Time taken: 21.407 seconds, Fetched: 15 row(s), MapReduce Total cumulative CPU time: 3 seconds 870 msec
 select count(txnno),category from txn_orc group by category;		==> Time taken: 25.982 seconds, Fetched: 15 row(s), MapReduce Total cumulative CPU time: 3 seconds 520 msec 
 select count(txnno),category from txn_parquet group by category;	==> Time taken: 22.198 seconds, Fetched: 15 row(s), MapReduce Total cumulative CPU time: 6 seconds 560 msec
+
+==============================================================
+HIVE Sqoop integration
+==============================================================
+sqoop import --connect jdbc:mysql://localhost/custpayments \
+--username root --password root \
+-table customers -m 2 --split-by customernumber \
+--target-dir /user/hduser/custdata/ --delete-target-dir --enclosed-by '\"';
+
+
+create external table custmaster (
+customerNumber int,
+customername string,
+contactlastname string,
+contactfirstname string)
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+WITH SERDEPROPERTIES (
+ "separatorChar" = ",",
+ "quoteChar" = "\"") 
+LOCATION '/user/hduser/custdata/';
+
+
+7. Create an external table to point the imported payments data location /user/hduser/paymentsdata/.
+
+CREATE EXTERNAL TABLE `payments`(
+  `customernumber` bigint,
+  `checknumber` string,
+  `paymentdate` date,
+  `amount` float)
+row format delimited
+fields terminated by ','
+location '/user/hduser/paymentsdata/';
+
+8. Create another external table called cust_payments in avro format and load using insert select option from the custmaster.
+create external table cust_payments(
+custno int,
+contactfirstname string,
+contactlastname string)
+row format delimited 
+fields terminated by '~'
+stored as avro 
+location '/user/hduser/paymentsavro';
+
+insert into table cust_payments 
+select customernumber,
+contactfirstname,
+contactlastname from custmaster;
+select count(*) from cust_payments;
+
+
+create external table cust_payments_orc(
+custno int,
+contactfirstname string,
+contactlastname string)
+row format delimited 
+fields terminated by '~'
+stored as orc 
+location '/user/hduser/paymentsorc';
+
+insert into table cust_payments_orc 
+select custno,
+contactfirstname,
+contactlastname from cust_payments;
+
+select count(*) from cust_payments_orc;
+
+==================================================================================================
+Create dynamic tables from DB to HIVE using AVRO format - No need of create table statements
+==================================================================================================
+sqoop import -Dmapreduce.job.user.classpath.first=true \
+--connect jdbc:mysql://localhost/custpayments --username root --password root \
+-table customers -m 3 --split-by customernumber \
+--target-dir /user/hduser/custavro \
+--delete-target-dir \
+--as-avrodatafile;
+
+==> get schema 
+hadoop jar /home/hduser/Downloads/avro-tools-1.8.1.jar getschema /user/hduser/custavro/part-m-00000.avro > /home/hduser/customer.avsc
+
+
+[hduser@Inceptez ~]$ cat /home/hduser/customer.avsc
+{
+  "type" : "record",
+  "name" : "customers",
+  "doc" : "Sqoop import of customers",
+  "fields" : [ {
+    "name" : "customerNumber",
+    "type" : [ "null", "int" ],
+    "default" : null,
+    "columnName" : "customerNumber",
+    "sqlType" : "4"
+  }, {
+    "name" : "customerName",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "customerName",
+    "sqlType" : "12"
+  }, {
+    "name" : "contactLastName",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "contactLastName",
+    "sqlType" : "12"
+  }, {
+    "name" : "contactFirstName",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "contactFirstName",
+    "sqlType" : "12"
+  }, {
+    "name" : "phone",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "phone",
+    "sqlType" : "12"
+  }, {
+    "name" : "addressLine1",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "addressLine1",
+    "sqlType" : "12"
+  }, {
+    "name" : "addressLine2",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "addressLine2",
+    "sqlType" : "12"
+  }, {
+    "name" : "city",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "city",
+    "sqlType" : "12"
+  }, {
+    "name" : "state",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "state",
+    "sqlType" : "12"
+  }, {
+    "name" : "postalCode",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "postalCode",
+    "sqlType" : "12"
+  }, {
+    "name" : "country",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "country",
+    "sqlType" : "12"
+  }, {
+    "name" : "salesRepEmployeeNumber",
+    "type" : [ "null", "int" ],
+    "default" : null,
+    "columnName" : "salesRepEmployeeNumber",
+    "sqlType" : "4"
+  }, {
+    "name" : "creditLimit",
+    "type" : [ "null", "string" ],
+    "default" : null,
+    "columnName" : "creditLimit",
+    "sqlType" : "3"
+  } ],
+  "tableName" : "customers"
+}
+
+
+hadoop fs -put -f customer.avsc /tmp/customer.avsc
+
+============================ create table using schema
+create external table customeravro 
+stored as AVRO 
+location '/user/hduser/custavro' 
+TBLPROPERTIES('avro.schema.url'='hdfs:///tmp/customer.avsc');
+
+
+
+==============================================================================================
+SCD :  Slowly Changing Data
+==============================================================================================
+create database stock;
+use stock;
+
+create table stockexchange(id integer,exchang varchar(100),company varchar(100),dt date,value float(10,3));
+
+insert into stock.stockexchange values(1,'NYSE','CLI','2019-01-01',35.39),
+(2,'NYSE','WAG','2019-01-01',24.39),
+(3,'NYSE','WMT','2019-01-01',145.31),
+(4,'NYSE','INT','2019-01-01',288.19);
+
+mysql> select * from stock.stockexchange;
++------+---------+---------+------------+---------+
+| id   | exchang | company | dt         | value   |
++------+---------+---------+------------+---------+
+|    1 | NYSE    | CLI     | 2019-01-01 |  35.390 |
+|    2 | NYSE    | WAG     | 2019-01-01 |  24.390 |
+|    3 | NYSE    | WMT     | 2019-01-01 | 145.310 |
+|    4 | NYSE    | INT     | 2019-01-01 | 288.190 |
++------+---------+---------+------------+---------+
+
+create database stock;
+use stock;
+drop table ext_stockexchange;
+
+	sqoop import --connect jdbc:mysql://localhost/stock \
+	--username root --password root \
+	--query "select id,exchang,company,value from stockexchange where dt>='2019-01-01' and \$CONDITIONS" \
+	--hive-import --hive-overwrite --hive-table stock.managed_stockexchange \
+	-m 1 --fields-terminated-by ',' \
+	--target-dir /user/hduser/stockexchange --delete-target-dir
+
+
+hive> select * from managed_stockexchange;
+OK
+managed_stockexchange.id        managed_stockexchange.exchang   managed_stockexchange.company   managed_stockexchange.value
+1       NYSE    CLI     35.39
+2       NYSE    WAG     24.39
+3       NYSE    WMT     145.31
+4       NYSE    INT     288.19
+
+==================================================================
+Type 1 SCDs - Overwriting
+==================================================================
+hive
+
+create table stock.ext_stockexchange (
+id int,
+ver int,
+exchang string,
+company string,
+value double)
+row format delimited fields terminated by ','
+location '/user/hduser/stockexchangedata';
+
+insert into table ext_stockexchange 
+select * from ext_stockexchange 
+where id not in (select id from managed_stockexchange) 
+union select id,1,exchang,company,value from stock.managed_stockexchange;
+
+ext_stockexchange.id    ext_stockexchange.ver   ext_stockexchange.exchang       ext_stockexchange.company       ext_stockexchange.value
+1       1       NYSE    CLI     35.39
+2       1       NYSE    WAG     24.39
+3       1       NYSE    WMT     145.31
+4       1       NYSE    INT     288.19
+
+mysql
+=========
+insert into stock.stockexchange 
+values(3,'NYSE','WMT','2019-01-03',147.51),
+(4,'NYSE','INT','2019-01-04',283.77);
+
+mysql> select * from stock.stockexchange;
++------+---------+---------+------------+---------+
+| id   | exchang | company | dt         | value   |
++------+---------+---------+------------+---------+
+|    1 | NYSE    | CLI     | 2019-01-01 |  35.390 |
+|    2 | NYSE    | WAG     | 2019-01-01 |  24.390 |
+|    3 | NYSE    | WMT     | 2019-01-01 | 145.310 |
+|    4 | NYSE    | INT     | 2019-01-01 | 288.190 |
+|    3 | NYSE    | WMT     | 2019-01-03 | 147.510 |
+|    4 | NYSE    | INT     | 2019-01-04 | 283.770 |
++------+---------+---------+------------+---------+
+
+sqoop import --connect jdbc:mysql://localhost/stock --username root --password root \
+--query "select id,exchang,company,value from stockexchange where dt>='2019-01-02' and \$CONDITIONS" \
+--hive-import --hive-overwrite --hive-table stock.managed_stockexchange -m 1 \
+--fields-terminated-by ',' --target-dir /user/hduser/stockexchange
+
+hive> select * from stock.managed_stockexchange;
+managed_stockexchange.id        managed_stockexchange.exchang   managed_stockexchange.company   managed_stockexchange.value
+3       NYSE    WMT     147.51
+4       NYSE    INT     283.77
+
+select a.* from ext_stockexchange a 
+left outer join managed_stockexchange b 
+on a.id =b.id where b.id is null 
+union select id,1,exchang,company,value from stock.managed_stockexchange;
+
+_u2.id  _u2.ver _u2.exchang     _u2.company     _u2.value
+1       1       NYSE    CLI     35.39
+2       1       NYSE    WAG     24.39
+3       1       NYSE    WMT     147.51
+4       1       NYSE    INT     283.77
+
+
+insert overwrite table ext_stockexchange 
+select * from ext_stockexchange 
+where id not in (select id from managed_stockexchange) 
+union select id,1,exchang,company,value from stock.managed_stockexchange;
+
+managed_stockexchange.id        managed_stockexchange.exchang   managed_stockexchange.company   managed_stockexchange.value
+3       NYSE    WMT     147.51
+4       NYSE    INT     283.77
+
+
+
+Type 2 SCDs - Creating another dimension record:
+
+managed_stockexchange.id        managed_stockexchange.exchang   managed_stockexchange.company   managed_stockexchange.value
+3       NYSE    WMT     147.51
+4       NYSE    INT     283.77
+
+
+sqoop import --connect jdbc:mysql://localhost/stock --username root --password root \
+--query "select id,exchang,company,value from stockexchange where dt>='2019-01-03' and \$CONDITIONS" \
+--hive-import --hive-overwrite --hive-table stock.managed_stockexchange -m 1 \
+--fields-terminated-by ',' \
+--target-dir /user/hduser/stockexchange --delete-target-dir
+
+
+
+mysql:
+insert into stock.stockexchange values(3,'NYSE','WMT','2019-01-04',157.81),(5,'NYSE','INT','2019-01-04',83.77);
+mysql> select * from stock.stockexchange;
++------+---------+---------+------------+---------+
+| id   | exchang | company | dt         | value   |
++------+---------+---------+------------+---------+
+|    1 | NYSE    | CLI     | 2019-01-01 |  35.390 |
+|    2 | NYSE    | WAG     | 2019-01-01 |  24.390 |
+|    3 | NYSE    | WMT     | 2019-01-01 | 145.310 |
+|    4 | NYSE    | INT     | 2019-01-01 | 288.190 |
+|    3 | NYSE    | WMT     | 2019-01-03 | 147.510 |
+|    4 | NYSE    | INT     | 2019-01-04 | 283.770 |
+|    3 | NYSE    | WMT     | 2019-01-04 | 157.810 |
+|    5 | NYSE    | INT     | 2019-01-04 |  83.770 |
++------+---------+---------+------------+---------+
+
+
+
+Hive:
+insert overwrite table ext_stockexchange
+select a.id,coalesce(b.ver1+row_number() over(partition by a.id),row_number() over(partition by a.id)) as ver,a.exchang,a.company,a.value from managed_stockexchange a
+left outer join (select id,max(ver) as ver1 from ext_stockexchange group by id) as b on a.id=b.id
+union
+select id,ver,exchang,company,value from ext_stockexchange;
+
+
+select * from ext_stockexchange;
+
+ext_stockexchange.id    ext_stockexchange.ver   ext_stockexchange.exchang       ext_stockexchange.company       ext_stockexchange.value
+1       1       NYSE    CLI     35.39
+2       1       NYSE    WAG     24.39
+3       1       NYSE    WMT     147.51
+3       2       NYSE    WMT     147.51
+4       1       NYSE    INT     283.77
+4       2       NYSE    INT     283.77
+
+
+=================================================================================
+Automation of Static Partition Tables:
+=================================================================================
+Create some sample data in the /home/hduser/hivepart location as given below:
+
+cp /home/hduser/hive/data/txns /home/hduser/hivepart/txns_20181212_PADE
+cp /home/hduser/hive/data/txns /home/hduser/hivepart/txns_20181212_NY
+cp /home/hduser/hive/data/txns /home/hduser/hivepart/txns_20181213_PADE
+cp /home/hduser/hive/data/txns /home/hduser/hivepart/txns_20181213_NY
+
+Create a shell script namely hivepart.ksh in the /home/hduser/hivepart location, 
+give execute permission and execute as 
+bash hivepart.ksh /home/hduser/hivepart retail.txnrecsbycatdtreg
+
+hivepart.ksh
+============
+set -x
+
+#!/bin/bash
+#Script to create hive partition load
+#bash hivepart.ksh /home/hduser/hivepart retail.txnrecsbycatdtreg
+echo "$0 is starting"
+echo "$1 is the source path of txn data sent by the source system"
+echo "$2 is the hive table with schema prefixed will be loaded with the above files generically"
+
+rm -f $1/partload.hql
+
+if [ $# -ne 2 ]
+then
+echo "$0 requires source data path and the target table name to load"
+exit 2
+fi
+
+echo "$1 is the path"
+echo "$2 is the tablename"
+
+
+for filepathnm in $1/txns_*; do
+echo "file with path name is $filepathnm"
+filenm=$(basename $filepathnm)
+echo "$filenm"
+dt=`echo $filenm |awk -F'_' '{print $2}'`
+dtfmt=`date -d $dt +'%Y-%m-%d'`
+echo $dtfmt
+reg=`echo $filenm |awk -F'_' '{print $3}'`
+echo $reg
+echo "LOAD DATA LOCAL INPATH '$1/$filenm' OVERWRITE INTO TABLE $2 PARTITION (datadt='$dtfmt',region='$reg');" >> $1/partload.hql
+done
+
+#cp /home/hduser/hivepart/partload.hql /home/hduser/partload.hql
+echo "loading hive table"
+hive -f $1/partload.hql
