@@ -1,0 +1,100 @@
+
+1. Copy the below fixed data into a linux file, load into a hive table called cust_fixed_raw in a column
+rawdata.
+1 Lara        chennai    55 2016-09-2110000
+2 vasudevan   banglore   43 2016-09-2390000
+3 Paul        chennai    33 2019-02-2020000
+4 David Hanna New Jersey 29 2019-04-22
+
+2. Create a temporary table called cust_delimited_parsed_temp with columns such as
+id,name,city,age,dt,amt and load the cust_fixed_raw table using substr.
+
+
+create temporary table temp_temp(raw_data string)
+load data local inpath 'cust_fixed_raw' into table temp_temp
+
+create temporary table cust_delimited_parsed_temp(
+    id int,
+    name string,
+    city string,
+    age int,
+    dt date,
+    amt float)
+	
+	
+insert into cust_delimited_parsed_temp
+select 
+trim(substr(raw_data(1,2))) as id,
+trim(substr(raw_data(4,12))) as name,
+trim(substr(raw_data(16,11))) as city,
+trim(substr(raw_data(26,3))) as age,
+trim(substr(raw_data(29,10))) as dt,
+trim(substr(raw_data(44,05))) as amt
+from temp_temp
+
+insert into cust_delimited_parsed_temp
+select substr(raw_data,1,2) from temp_temp,
+select substr(raw_data,3,12) from temp_temp,
+select substr(raw_data,15,11) from temp_temp,
+select substr(raw_data,25,2) from temp_temp,
+select substr(raw_data,29,10) from temp_temp,
+select substr(raw_data,39,05) from temp_temp;
+
+
+insert into cust_delimited_parsed_temp
+select 
+trim(substr(raw_data,1,2)), 
+trim(substr(raw_data,3,12)), 
+trim(substr(raw_data,15,11)), 
+trim(substr(raw_data,26,2)), 
+trim(substr(raw_data,29,10)),  
+trim(substr(raw_data,39,05)) from temp_temp
+
+3. Export only id, dt and amt column into a mysql table cust_fixed_mysql using sqoop export.
+sqoop export --connect jdbc:mysql://localhost/custdb \
+--username root --password root \
+-m 2 \
+--table cust_fixed_mysql \
+--columns 
+--batch
+
+
+
+4. Load only chennai data to another table called cust_parsed_orc of type orc format partitioned based
+on dt.
+
+5. Create a json table called cust_parsed_json (to load into json use the following steps).
+cd /home/hduser/hiveusecase
+wget https://repo1.maven.org/maven2/org/apache/hive/hcatalog/hive-hcatalog-core/1.2.1/hivehcatalog-core-1.2.1.jar
+
+
+
+
+wget https://repo1.maven.org/maven2/org/apache/hive/hcatalog/hive-hcatalog-core/1.2.1/hive-hcatalog-core-1.2.1.jar
+
+
+
+create external table cust_parsed_json(id int, name string,city string, age int)
+ROW FORMAT SERDE 'org.apache.hive.hcatalog.data.JsonSerDe'
+stored as textfile
+location '/user/hduser/custjson';
+
+6. Insert into the cust_parsed_json only non chennai data using insert select of id,name,city, age from
+the cust_delimited_parsed_temp table
+
+insert into retail.cust_parsed_json
+select id, name, city, age from cust_delimited_parsed_temp
+where city not in('chennai')
+
+7.
+Convert the XML table called xml_bank created in the actual usecase to JSON data by the same way like
+step 5 using create table as select
+
+create external table xml_json
+ROW FORMAT SERDE 'org.apache.hive.hcatalog.data.JsonSerDe'
+stored as textfile
+location '/user/hduser/custxmljson'
+as select * from xml_bank;
+
+
+
