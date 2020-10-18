@@ -1,0 +1,258 @@
+2020-09-19 10:17:22,645 [myid:] - INFO  [main:QuorumPeerConfig@103] - Reading configuration from: /usr/local/zookeeper/bin/../conf/zoo.cfg
+2020-09-19 10:17:22,650 [myid:] - INFO  [main:DatadirCleanupManager@78] - autopurge.snapRetainCount set to 3
+2020-09-19 10:17:22,650 [myid:] - INFO  [main:DatadirCleanupManager@79] - autopurge.purgeInterval set to 0
+2020-09-19 10:17:22,650 [myid:] - INFO  [main:DatadirCleanupManager@101] - Purge task is not scheduled.
+2020-09-19 10:17:22,651 [myid:] - WARN  [main:QuorumPeerMain@113] - Either no config or no quorum defined in config, running  in standalone mode
+2020-09-19 10:17:22,668 [myid:] - INFO  [main:QuorumPeerConfig@103] - Reading configuration from: /usr/local/zookeeper/bin/../conf/zoo.cfg
+2020-09-19 10:17:22,669 [myid:] - INFO  [main:ZooKeeperServerMain@95] - Starting server
+2020-09-19 10:17:22,676 [myid:] - INFO  [main:Environment@100] - Server environment:zookeeper.version=3.4.6-1569965, built on 02/20/2014 09:09 GMT
+2020-09-19 10:17:22,676 [myid:] - INFO  [main:Environment@100] - Server environment:host.name=Inceptez
+2020-09-19 10:17:22,676 [myid:] - INFO  [main:Environment@100] - Server environment:java.version=1.8.0_71
+2020-09-19 10:17:22,676 [myid:] - INFO  [main:Environment@100] - Server environment:java.vendor=Oracle Corporation
+2020-09-19 10:17:22,677 [myid:] - INFO  [main:Environment@100] - Server environment:java.home=/usr/lib/jvm/jdk1.8.0_71/jre
+2020-09-19 10:17:22,677 [myid:] - INFO  [main:Environment@100] - Server environment:java.class.path=/usr/local/zookeeper/bin/../build/classes:/usr/local/zookeeper/bin/../build/lib/*.jar:/usr/local/zookeeper/bin/../lib/slf4j-log4j12-1.6.1.jar:/usr/local/zookeeper/bin/../lib/slf4j-api-1.6.1.jar:/usr/local/zookeeper/bin/../lib/netty-3.7.0.Final.jar:/usr/local/zookeeper/bin/../lib/log4j-1.2.16.jar:/usr/local/zookeeper/bin/../lib/jline-0.9.94.jar:/usr/local/zookeeper/bin/../zookeeper-3.4.6.jar:/usr/local/zookeeper/bin/../src/java/lib/*.jar:/usr/local/zookeeper/bin/../conf:
+2020-09-19 10:17:22,677 [myid:] - INFO  [main:Environment@100] - Server environment:java.library.path=/usr/java/packages/lib/amd64:/usr/lib64:/lib64:/lib:/usr/lib
+2020-09-19 10:17:22,677 [myid:] - INFO  [main:Environment@100] - Server environment:java.io.tmpdir=/tmp
+2020-09-19 10:17:22,677 [myid:] - INFO  [main:Environment@100] - Server environment:java.compiler=<NA>
+2020-09-19 10:17:22,679 [myid:] - INFO  [main:Environment@100] - Server environment:os.name=Linux
+2020-09-19 10:17:22,679 [myid:] - INFO  [main:Environment@100] - Server environment:os.arch=amd64
+2020-09-19 10:17:22,679 [myid:] - INFO  [main:Environment@100] - Server environment:os.version=2.6.32-642.11.1.el6.x86_64
+2020-09-19 10:17:22,679 [myid:] - INFO  [main:Environment@100] - Server environment:user.name=hduser
+2020-09-19 10:17:22,680 [myid:] - INFO  [main:Environment@100] - Server environment:user.home=/home/hduser
+2020-09-19 10:17:22,683 [myid:] - INFO  [main:Environment@100] - Server environment:user.dir=/home/hduser/creditcard_insurance
+2020-09-19 10:17:22,691 [myid:] - INFO  [main:ZooKeeperServer@755] - tickTime set to 2000
+2020-09-19 10:17:22,691 [myid:] - INFO  [main:ZooKeeperServer@764] - minSessionTimeout set to -1
+2020-09-19 10:17:22,691 [myid:] - INFO  [main:ZooKeeperServer@773] - maxSessionTimeout set to -1
+2020-09-19 10:17:22,701 [myid:] - INFO  [main:NIOServerCnxnFactory@94] - binding to port 0.0.0.0/0.0.0.0:2181
+2020-09-19 10:17:31,224 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /0:0:0:0:0:0:0:1:46916
+2020-09-19 10:17:31,340 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@868] - Client attempting to establish new session at /0:0:0:0:0:0:0:1:46916
+2020-09-19 10:17:31,341 [myid:] - INFO  [SyncThread:0:FileTxnLog@199] - Creating new log file: log.121a
+2020-09-19 10:17:31,358 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@617] - Established session 0x174a4b02b0d0000 with negotiated timeout 40000 for client /0:0:0:0:0:0:0:1:46916
+2020-09-19 10:17:31,365 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@645] - Got user-level KeeperException when processing sessionid:0x174a4b02b0d0000 type:create cxid:0x1 zxid:0x121b txntype:-1 reqpath:n/a Error Path:/hbase Error:KeeperErrorCode = NodeExists for /hbase
+2020-09-19 10:17:32,700 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /0:0:0:0:0:0:0:1:46924
+2020-09-19 10:17:32,701 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@868] - Client attempting to establish new session at /0:0:0:0:0:0:0:1:46924
+2020-09-19 10:17:32,703 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@617] - Established session 0x174a4b02b0d0001 with negotiated timeout 40000 for client /0:0:0:0:0:0:0:1:46924
+2020-09-19 10:17:32,905 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@645] - Got user-level KeeperException when processing sessionid:0x174a4b02b0d0000 type:create cxid:0x63 zxid:0x1220 txntype:-1 reqpath:n/a Error Path:/hbase/online-snapshot/acquired Error:KeeperErrorCode = NodeExists for /hbase/online-snapshot/acquired
+2020-09-19 10:17:32,937 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /0:0:0:0:0:0:0:1:46926
+2020-09-19 10:17:32,938 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@868] - Client attempting to establish new session at /0:0:0:0:0:0:0:1:46926
+2020-09-19 10:17:32,939 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@617] - Established session 0x174a4b02b0d0002 with negotiated timeout 40000 for client /0:0:0:0:0:0:0:1:46926
+2020-09-19 10:17:32,955 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@645] - Got user-level KeeperException when processing sessionid:0x174a4b02b0d0002 type:create cxid:0x1 zxid:0x1222 txntype:-1 reqpath:n/a Error Path:/hbase/replication/rs Error:KeeperErrorCode = NodeExists for /hbase/replication/rs
+2020-09-19 10:18:00,966 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /127.0.0.1:59710
+2020-09-19 10:18:00,974 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@868] - Client attempting to establish new session at /127.0.0.1:59710
+2020-09-19 10:18:00,976 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@617] - Established session 0x174a4b02b0d0003 with negotiated timeout 40000 for client /127.0.0.1:59710
+2020-09-19 10:18:01,152 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /127.0.0.1:59712
+2020-09-19 10:18:01,153 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@868] - Client attempting to establish new session at /127.0.0.1:59712
+2020-09-19 10:18:01,155 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@617] - Established session 0x174a4b02b0d0004 with negotiated timeout 40000 for client /127.0.0.1:59712
+2020-09-19 10:18:01,615 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@645] - Got user-level KeeperException when processing sessionid:0x174a4b02b0d0003 type:create cxid:0x9 zxid:0x1225 txntype:-1 reqpath:n/a Error Path:/hbase/online-snapshot/acquired Error:KeeperErrorCode = NodeExists for /hbase/online-snapshot/acquired
+2020-09-19 10:18:02,438 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /0:0:0:0:0:0:0:1:46936
+2020-09-19 10:18:02,440 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@868] - Client attempting to establish new session at /0:0:0:0:0:0:0:1:46936
+2020-09-19 10:18:02,442 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@617] - Established session 0x174a4b02b0d0005 with negotiated timeout 40000 for client /0:0:0:0:0:0:0:1:46936
+2020-09-19 10:18:02,523 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /0:0:0:0:0:0:0:1:46938
+2020-09-19 10:18:02,525 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@868] - Client attempting to establish new session at /0:0:0:0:0:0:0:1:46938
+2020-09-19 10:18:02,527 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@617] - Established session 0x174a4b02b0d0006 with negotiated timeout 40000 for client /0:0:0:0:0:0:0:1:46938
+2020-09-19 10:18:04,001 [myid:] - INFO  [SessionTracker:ZooKeeperServer@347] - Expiring session 0x174a23b182a003d, timeout of 40000ms exceeded
+2020-09-19 10:18:04,001 [myid:] - INFO  [SessionTracker:ZooKeeperServer@347] - Expiring session 0x174a23b182a0006, timeout of 40000ms exceeded
+2020-09-19 10:18:04,001 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@494] - Processed session termination for sessionid: 0x174a23b182a003d
+2020-09-19 10:18:04,001 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@494] - Processed session termination for sessionid: 0x174a23b182a0006
+2020-09-19 10:18:07,746 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@645] - Got user-level KeeperException when processing sessionid:0x174a4b02b0d0000 type:create cxid:0x23d zxid:0x12a3 txntype:-1 reqpath:n/a Error Path:/hbase/namespace/default Error:KeeperErrorCode = NodeExists for /hbase/namespace/default
+2020-09-19 10:18:07,754 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@645] - Got user-level KeeperException when processing sessionid:0x174a4b02b0d0000 type:create cxid:0x240 zxid:0x12a5 txntype:-1 reqpath:n/a Error Path:/hbase/namespace/hbase Error:KeeperErrorCode = NodeExists for /hbase/namespace/hbase
+2020-09-19 10:18:09,834 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /127.0.0.1:59824
+2020-09-19 10:18:09,835 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@868] - Client attempting to establish new session at /127.0.0.1:59824
+2020-09-19 10:18:09,837 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@617] - Established session 0x174a4b02b0d0007 with negotiated timeout 40000 for client /127.0.0.1:59824
+2020-09-19 10:18:09,855 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /127.0.0.1:59826
+2020-09-19 10:18:09,856 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@868] - Client attempting to establish new session at /127.0.0.1:59826
+2020-09-19 10:18:09,858 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@617] - Established session 0x174a4b02b0d0008 with negotiated timeout 40000 for client /127.0.0.1:59826
+2020-09-19 10:18:09,971 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@494] - Processed session termination for sessionid: 0x174a4b02b0d0007
+2020-09-19 10:18:09,974 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1007] - Closed socket connection for client /127.0.0.1:59824 which had sessionid 0x174a4b02b0d0007
+2020-09-19 10:18:09,978 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@494] - Processed session termination for sessionid: 0x174a4b02b0d0008
+2020-09-19 10:18:09,979 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1007] - Closed socket connection for client /127.0.0.1:59826 which had sessionid 0x174a4b02b0d0008
+2020-09-19 10:18:11,809 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /127.0.0.1:59832
+2020-09-19 10:18:11,816 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@868] - Client attempting to establish new session at /127.0.0.1:59832
+2020-09-19 10:18:11,817 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@617] - Established session 0x174a4b02b0d0009 with negotiated timeout 40000 for client /127.0.0.1:59832
+2020-09-19 10:18:12,799 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /127.0.0.1:59834
+2020-09-19 10:18:12,800 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@868] - Client attempting to establish new session at /127.0.0.1:59834
+2020-09-19 10:18:12,802 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@617] - Established session 0x174a4b02b0d000a with negotiated timeout 40000 for client /127.0.0.1:59834
+2020-09-19 10:18:13,117 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@494] - Processed session termination for sessionid: 0x174a4b02b0d000a
+2020-09-19 10:18:13,120 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1007] - Closed socket connection for client /127.0.0.1:59834 which had sessionid 0x174a4b02b0d000a
+2020-09-19 10:18:13,205 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@494] - Processed session termination for sessionid: 0x174a4b02b0d0009
+2020-09-19 10:18:13,208 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1007] - Closed socket connection for client /127.0.0.1:59832 which had sessionid 0x174a4b02b0d0009
+2020-09-19 10:18:29,467 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /127.0.0.1:59984
+2020-09-19 10:18:29,472 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@868] - Client attempting to establish new session at /127.0.0.1:59984
+2020-09-19 10:18:29,475 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@617] - Established session 0x174a4b02b0d000b with negotiated timeout 40000 for client /127.0.0.1:59984
+2020-09-19 10:18:31,008 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@494] - Processed session termination for sessionid: 0x174a4b02b0d000b
+2020-09-19 10:18:31,011 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1007] - Closed socket connection for client /127.0.0.1:59984 which had sessionid 0x174a4b02b0d000b
+2020-09-19 10:19:51,122 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /127.0.0.1:60032
+2020-09-19 10:19:51,127 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@868] - Client attempting to establish new session at /127.0.0.1:60032
+2020-09-19 10:19:51,130 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@617] - Established session 0x174a4b02b0d000c with negotiated timeout 40000 for client /127.0.0.1:60032
+2020-09-19 10:19:51,243 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /127.0.0.1:60034
+2020-09-19 10:19:51,244 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@868] - Client attempting to establish new session at /127.0.0.1:60034
+2020-09-19 10:19:51,248 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@617] - Established session 0x174a4b02b0d000d with negotiated timeout 40000 for client /127.0.0.1:60034
+2020-09-19 10:19:51,718 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@494] - Processed session termination for sessionid: 0x174a4b02b0d000d
+2020-09-19 10:19:51,721 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1007] - Closed socket connection for client /127.0.0.1:60034 which had sessionid 0x174a4b02b0d000d
+2020-09-19 10:19:51,775 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@645] - Got user-level KeeperException when processing sessionid:0x174a4b02b0d0000 type:create cxid:0x285 zxid:0x12d2 txntype:-1 reqpath:n/a Error Path:/hbase/table-lock/insurancehive Error:KeeperErrorCode = NoNode for /hbase/table-lock/insurancehive
+2020-09-19 10:19:52,167 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /127.0.0.1:60056
+2020-09-19 10:19:52,170 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@868] - Client attempting to establish new session at /127.0.0.1:60056
+2020-09-19 10:19:52,174 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@617] - Established session 0x174a4b02b0d000e with negotiated timeout 40000 for client /127.0.0.1:60056
+2020-09-19 10:19:52,198 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@494] - Processed session termination for sessionid: 0x174a4b02b0d000e
+2020-09-19 10:19:52,203 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1007] - Closed socket connection for client /127.0.0.1:60056 which had sessionid 0x174a4b02b0d000e
+2020-09-19 10:20:35,276 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /127.0.0.1:60382
+2020-09-19 10:20:35,282 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@868] - Client attempting to establish new session at /127.0.0.1:60382
+2020-09-19 10:20:35,284 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@617] - Established session 0x174a4b02b0d000f with negotiated timeout 40000 for client /127.0.0.1:60382
+2020-09-19 10:20:37,206 [myid:] - WARN  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@357] - caught end of stream exception
+EndOfStreamException: Unable to read additional data from client sessionid 0x174a4b02b0d000f, likely client has closed socket
+	at org.apache.zookeeper.server.NIOServerCnxn.doIO(NIOServerCnxn.java:228)
+	at org.apache.zookeeper.server.NIOServerCnxnFactory.run(NIOServerCnxnFactory.java:208)
+	at java.lang.Thread.run(Thread.java:745)
+2020-09-19 10:20:37,215 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1007] - Closed socket connection for client /127.0.0.1:60382 which had sessionid 0x174a4b02b0d000f
+2020-09-19 10:20:37,489 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /0:0:0:0:0:0:0:1:47614
+2020-09-19 10:20:37,494 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@868] - Client attempting to establish new session at /0:0:0:0:0:0:0:1:47614
+2020-09-19 10:20:37,496 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@617] - Established session 0x174a4b02b0d0010 with negotiated timeout 40000 for client /0:0:0:0:0:0:0:1:47614
+2020-09-19 10:21:18,004 [myid:] - INFO  [SessionTracker:ZooKeeperServer@347] - Expiring session 0x174a4b02b0d000f, timeout of 40000ms exceeded
+2020-09-19 10:21:18,006 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@494] - Processed session termination for sessionid: 0x174a4b02b0d000f
+2020-09-19 10:21:43,915 [myid:] - WARN  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@357] - caught end of stream exception
+EndOfStreamException: Unable to read additional data from client sessionid 0x174a4b02b0d000c, likely client has closed socket
+	at org.apache.zookeeper.server.NIOServerCnxn.doIO(NIOServerCnxn.java:228)
+	at org.apache.zookeeper.server.NIOServerCnxnFactory.run(NIOServerCnxnFactory.java:208)
+	at java.lang.Thread.run(Thread.java:745)
+2020-09-19 10:21:43,919 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1007] - Closed socket connection for client /127.0.0.1:60032 which had sessionid 0x174a4b02b0d000c
+2020-09-19 10:21:46,228 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /0:0:0:0:0:0:0:1:47638
+2020-09-19 10:21:46,231 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@868] - Client attempting to establish new session at /0:0:0:0:0:0:0:1:47638
+2020-09-19 10:21:46,233 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@617] - Established session 0x174a4b02b0d0011 with negotiated timeout 40000 for client /0:0:0:0:0:0:0:1:47638
+2020-09-19 10:21:47,462 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /0:0:0:0:0:0:0:1:47640
+2020-09-19 10:21:47,463 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@868] - Client attempting to establish new session at /0:0:0:0:0:0:0:1:47640
+2020-09-19 10:21:47,464 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@617] - Established session 0x174a4b02b0d0012 with negotiated timeout 40000 for client /0:0:0:0:0:0:0:1:47640
+2020-09-19 10:21:47,477 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /127.0.0.1:60424
+2020-09-19 10:21:47,477 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@868] - Client attempting to establish new session at /127.0.0.1:60424
+2020-09-19 10:21:47,478 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@617] - Established session 0x174a4b02b0d0013 with negotiated timeout 40000 for client /127.0.0.1:60424
+2020-09-19 10:21:47,701 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@494] - Processed session termination for sessionid: 0x174a4b02b0d0012
+2020-09-19 10:21:47,707 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1007] - Closed socket connection for client /0:0:0:0:0:0:0:1:47640 which had sessionid 0x174a4b02b0d0012
+2020-09-19 10:21:47,808 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@494] - Processed session termination for sessionid: 0x174a4b02b0d0013
+2020-09-19 10:21:47,812 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1007] - Closed socket connection for client /127.0.0.1:60424 which had sessionid 0x174a4b02b0d0013
+2020-09-19 10:22:20,001 [myid:] - INFO  [SessionTracker:ZooKeeperServer@347] - Expiring session 0x174a4b02b0d000c, timeout of 40000ms exceeded
+2020-09-19 10:22:20,001 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@494] - Processed session termination for sessionid: 0x174a4b02b0d000c
+2020-09-19 10:22:26,824 [myid:] - WARN  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@357] - caught end of stream exception
+EndOfStreamException: Unable to read additional data from client sessionid 0x174a4b02b0d0010, likely client has closed socket
+	at org.apache.zookeeper.server.NIOServerCnxn.doIO(NIOServerCnxn.java:228)
+	at org.apache.zookeeper.server.NIOServerCnxnFactory.run(NIOServerCnxnFactory.java:208)
+	at java.lang.Thread.run(Thread.java:745)
+2020-09-19 10:22:26,826 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1007] - Closed socket connection for client /0:0:0:0:0:0:0:1:47614 which had sessionid 0x174a4b02b0d0010
+2020-09-19 10:23:06,002 [myid:] - INFO  [SessionTracker:ZooKeeperServer@347] - Expiring session 0x174a4b02b0d0010, timeout of 40000ms exceeded
+2020-09-19 10:23:06,004 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@494] - Processed session termination for sessionid: 0x174a4b02b0d0010
+2020-09-19 10:23:13,157 [myid:] - WARN  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@357] - caught end of stream exception
+EndOfStreamException: Unable to read additional data from client sessionid 0x174a4b02b0d0011, likely client has closed socket
+	at org.apache.zookeeper.server.NIOServerCnxn.doIO(NIOServerCnxn.java:228)
+	at org.apache.zookeeper.server.NIOServerCnxnFactory.run(NIOServerCnxnFactory.java:208)
+	at java.lang.Thread.run(Thread.java:745)
+2020-09-19 10:23:13,161 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1007] - Closed socket connection for client /0:0:0:0:0:0:0:1:47638 which had sessionid 0x174a4b02b0d0011
+2020-09-19 10:23:16,561 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /127.0.0.1:60542
+2020-09-19 10:23:16,573 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@868] - Client attempting to establish new session at /127.0.0.1:60542
+2020-09-19 10:23:16,574 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@617] - Established session 0x174a4b02b0d0014 with negotiated timeout 40000 for client /127.0.0.1:60542
+2020-09-19 10:23:17,733 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /0:0:0:0:0:0:0:1:47762
+2020-09-19 10:23:17,734 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@868] - Client attempting to establish new session at /0:0:0:0:0:0:0:1:47762
+2020-09-19 10:23:17,736 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@617] - Established session 0x174a4b02b0d0015 with negotiated timeout 40000 for client /0:0:0:0:0:0:0:1:47762
+2020-09-19 10:23:17,744 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /0:0:0:0:0:0:0:1:47764
+2020-09-19 10:23:17,745 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@868] - Client attempting to establish new session at /0:0:0:0:0:0:0:1:47764
+2020-09-19 10:23:17,746 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@617] - Established session 0x174a4b02b0d0016 with negotiated timeout 40000 for client /0:0:0:0:0:0:0:1:47764
+2020-09-19 10:23:17,959 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@494] - Processed session termination for sessionid: 0x174a4b02b0d0015
+2020-09-19 10:23:17,960 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1007] - Closed socket connection for client /0:0:0:0:0:0:0:1:47762 which had sessionid 0x174a4b02b0d0015
+2020-09-19 10:23:18,064 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@494] - Processed session termination for sessionid: 0x174a4b02b0d0016
+2020-09-19 10:23:18,065 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1007] - Closed socket connection for client /0:0:0:0:0:0:0:1:47764 which had sessionid 0x174a4b02b0d0016
+2020-09-19 10:23:25,635 [myid:] - WARN  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@357] - caught end of stream exception
+EndOfStreamException: Unable to read additional data from client sessionid 0x174a4b02b0d0014, likely client has closed socket
+	at org.apache.zookeeper.server.NIOServerCnxn.doIO(NIOServerCnxn.java:228)
+	at org.apache.zookeeper.server.NIOServerCnxnFactory.run(NIOServerCnxnFactory.java:208)
+	at java.lang.Thread.run(Thread.java:745)
+2020-09-19 10:23:25,637 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1007] - Closed socket connection for client /127.0.0.1:60542 which had sessionid 0x174a4b02b0d0014
+2020-09-19 10:23:43,364 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /0:0:0:0:0:0:0:1:47786
+2020-09-19 10:23:43,368 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@868] - Client attempting to establish new session at /0:0:0:0:0:0:0:1:47786
+2020-09-19 10:23:43,370 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@617] - Established session 0x174a4b02b0d0017 with negotiated timeout 40000 for client /0:0:0:0:0:0:0:1:47786
+2020-09-19 10:23:44,455 [myid:] - WARN  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@357] - caught end of stream exception
+EndOfStreamException: Unable to read additional data from client sessionid 0x174a4b02b0d0017, likely client has closed socket
+	at org.apache.zookeeper.server.NIOServerCnxn.doIO(NIOServerCnxn.java:228)
+	at org.apache.zookeeper.server.NIOServerCnxnFactory.run(NIOServerCnxnFactory.java:208)
+	at java.lang.Thread.run(Thread.java:745)
+2020-09-19 10:23:44,460 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1007] - Closed socket connection for client /0:0:0:0:0:0:0:1:47786 which had sessionid 0x174a4b02b0d0017
+2020-09-19 10:23:50,001 [myid:] - INFO  [SessionTracker:ZooKeeperServer@347] - Expiring session 0x174a4b02b0d0011, timeout of 40000ms exceeded
+2020-09-19 10:23:50,002 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@494] - Processed session termination for sessionid: 0x174a4b02b0d0011
+2020-09-19 10:23:51,497 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@494] - Processed session termination for sessionid: 0x174a4b02b0d0004
+2020-09-19 10:23:51,501 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1007] - Closed socket connection for client /127.0.0.1:59712 which had sessionid 0x174a4b02b0d0004
+2020-09-19 10:23:52,430 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@494] - Processed session termination for sessionid: 0x174a4b02b0d0005
+2020-09-19 10:23:52,432 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1007] - Closed socket connection for client /0:0:0:0:0:0:0:1:46936 which had sessionid 0x174a4b02b0d0005
+2020-09-19 10:23:52,439 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@494] - Processed session termination for sessionid: 0x174a4b02b0d0003
+2020-09-19 10:23:52,439 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@494] - Processed session termination for sessionid: 0x174a4b02b0d0002
+2020-09-19 10:23:52,441 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1007] - Closed socket connection for client /127.0.0.1:59710 which had sessionid 0x174a4b02b0d0003
+2020-09-19 10:23:52,442 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1007] - Closed socket connection for client /0:0:0:0:0:0:0:1:46926 which had sessionid 0x174a4b02b0d0002
+2020-09-19 10:23:52,450 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@494] - Processed session termination for sessionid: 0x174a4b02b0d0001
+2020-09-19 10:23:52,452 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1007] - Closed socket connection for client /0:0:0:0:0:0:0:1:46924 which had sessionid 0x174a4b02b0d0001
+2020-09-19 10:23:52,453 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@494] - Processed session termination for sessionid: 0x174a4b02b0d0000
+2020-09-19 10:23:52,455 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1007] - Closed socket connection for client /0:0:0:0:0:0:0:1:46916 which had sessionid 0x174a4b02b0d0000
+2020-09-19 10:23:52,927 [myid:] - WARN  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@357] - caught end of stream exception
+EndOfStreamException: Unable to read additional data from client sessionid 0x174a4b02b0d0006, likely client has closed socket
+	at org.apache.zookeeper.server.NIOServerCnxn.doIO(NIOServerCnxn.java:228)
+	at org.apache.zookeeper.server.NIOServerCnxnFactory.run(NIOServerCnxnFactory.java:208)
+	at java.lang.Thread.run(Thread.java:745)
+2020-09-19 10:23:52,927 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1007] - Closed socket connection for client /0:0:0:0:0:0:0:1:46938 which had sessionid 0x174a4b02b0d0006
+2020-09-19 10:24:00,001 [myid:] - INFO  [SessionTracker:ZooKeeperServer@347] - Expiring session 0x174a4b02b0d0014, timeout of 40000ms exceeded
+2020-09-19 10:24:00,001 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@494] - Processed session termination for sessionid: 0x174a4b02b0d0014
+2020-09-19 10:24:06,927 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /0:0:0:0:0:0:0:1:47820
+2020-09-19 10:24:06,939 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@868] - Client attempting to establish new session at /0:0:0:0:0:0:0:1:47820
+2020-09-19 10:24:06,941 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@617] - Established session 0x174a4b02b0d0018 with negotiated timeout 40000 for client /0:0:0:0:0:0:0:1:47820
+2020-09-19 10:24:06,950 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@645] - Got user-level KeeperException when processing sessionid:0x174a4b02b0d0018 type:create cxid:0x1 zxid:0x1304 txntype:-1 reqpath:n/a Error Path:/hbase Error:KeeperErrorCode = NodeExists for /hbase
+2020-09-19 10:24:08,266 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /127.0.0.1:60608
+2020-09-19 10:24:08,267 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@868] - Client attempting to establish new session at /127.0.0.1:60608
+2020-09-19 10:24:08,269 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@617] - Established session 0x174a4b02b0d0019 with negotiated timeout 40000 for client /127.0.0.1:60608
+2020-09-19 10:24:08,399 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@645] - Got user-level KeeperException when processing sessionid:0x174a4b02b0d0018 type:create cxid:0x65 zxid:0x1309 txntype:-1 reqpath:n/a Error Path:/hbase/online-snapshot/acquired Error:KeeperErrorCode = NodeExists for /hbase/online-snapshot/acquired
+2020-09-19 10:24:08,415 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /127.0.0.1:60610
+2020-09-19 10:24:08,416 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@868] - Client attempting to establish new session at /127.0.0.1:60610
+2020-09-19 10:24:08,419 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@617] - Established session 0x174a4b02b0d001a with negotiated timeout 40000 for client /127.0.0.1:60610
+2020-09-19 10:24:08,424 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@645] - Got user-level KeeperException when processing sessionid:0x174a4b02b0d001a type:create cxid:0x1 zxid:0x130b txntype:-1 reqpath:n/a Error Path:/hbase/replication/rs Error:KeeperErrorCode = NodeExists for /hbase/replication/rs
+2020-09-19 10:24:19,315 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /0:0:0:0:0:0:0:1:47830
+2020-09-19 10:24:19,325 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@868] - Client attempting to establish new session at /0:0:0:0:0:0:0:1:47830
+2020-09-19 10:24:19,327 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@617] - Established session 0x174a4b02b0d001b with negotiated timeout 40000 for client /0:0:0:0:0:0:0:1:47830
+2020-09-19 10:24:19,425 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /127.0.0.1:60614
+2020-09-19 10:24:19,426 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@868] - Client attempting to establish new session at /127.0.0.1:60614
+2020-09-19 10:24:19,428 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@617] - Established session 0x174a4b02b0d001c with negotiated timeout 40000 for client /127.0.0.1:60614
+2020-09-19 10:24:19,808 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@645] - Got user-level KeeperException when processing sessionid:0x174a4b02b0d001b type:create cxid:0x9 zxid:0x130e txntype:-1 reqpath:n/a Error Path:/hbase/online-snapshot/acquired Error:KeeperErrorCode = NodeExists for /hbase/online-snapshot/acquired
+2020-09-19 10:24:20,775 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /127.0.0.1:60620
+2020-09-19 10:24:20,778 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@868] - Client attempting to establish new session at /127.0.0.1:60620
+2020-09-19 10:24:20,780 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@617] - Established session 0x174a4b02b0d001d with negotiated timeout 40000 for client /127.0.0.1:60620
+2020-09-19 10:24:20,870 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /127.0.0.1:60622
+2020-09-19 10:24:20,872 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@868] - Client attempting to establish new session at /127.0.0.1:60622
+2020-09-19 10:24:20,873 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@617] - Established session 0x174a4b02b0d001e with negotiated timeout 40000 for client /127.0.0.1:60622
+2020-09-19 10:24:24,002 [myid:] - INFO  [SessionTracker:ZooKeeperServer@347] - Expiring session 0x174a4b02b0d0017, timeout of 40000ms exceeded
+2020-09-19 10:24:24,003 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@494] - Processed session termination for sessionid: 0x174a4b02b0d0017
+2020-09-19 10:24:25,532 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@645] - Got user-level KeeperException when processing sessionid:0x174a4b02b0d0018 type:create cxid:0x23d zxid:0x138a txntype:-1 reqpath:n/a Error Path:/hbase/namespace/default Error:KeeperErrorCode = NodeExists for /hbase/namespace/default
+2020-09-19 10:24:25,544 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@645] - Got user-level KeeperException when processing sessionid:0x174a4b02b0d0018 type:create cxid:0x245 zxid:0x138e txntype:-1 reqpath:n/a Error Path:/hbase/namespace/hbase Error:KeeperErrorCode = NodeExists for /hbase/namespace/hbase
+2020-09-19 10:24:27,817 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /0:0:0:0:0:0:0:1:47966
+2020-09-19 10:24:27,819 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@868] - Client attempting to establish new session at /0:0:0:0:0:0:0:1:47966
+2020-09-19 10:24:27,820 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@617] - Established session 0x174a4b02b0d001f with negotiated timeout 40000 for client /0:0:0:0:0:0:0:1:47966
+2020-09-19 10:24:27,838 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /0:0:0:0:0:0:0:1:47968
+2020-09-19 10:24:27,841 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@868] - Client attempting to establish new session at /0:0:0:0:0:0:0:1:47968
+2020-09-19 10:24:27,842 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@617] - Established session 0x174a4b02b0d0020 with negotiated timeout 40000 for client /0:0:0:0:0:0:0:1:47968
+2020-09-19 10:24:27,909 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@494] - Processed session termination for sessionid: 0x174a4b02b0d001f
+2020-09-19 10:24:27,914 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1007] - Closed socket connection for client /0:0:0:0:0:0:0:1:47966 which had sessionid 0x174a4b02b0d001f
+2020-09-19 10:24:28,021 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@494] - Processed session termination for sessionid: 0x174a4b02b0d0020
+2020-09-19 10:24:28,025 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1007] - Closed socket connection for client /0:0:0:0:0:0:0:1:47968 which had sessionid 0x174a4b02b0d0020
+2020-09-19 10:24:28,787 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /127.0.0.1:60754
+2020-09-19 10:24:28,789 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@868] - Client attempting to establish new session at /127.0.0.1:60754
+2020-09-19 10:24:28,791 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@617] - Established session 0x174a4b02b0d0021 with negotiated timeout 40000 for client /127.0.0.1:60754
+2020-09-19 10:24:29,930 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /0:0:0:0:0:0:0:1:47974
+2020-09-19 10:24:29,930 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@868] - Client attempting to establish new session at /0:0:0:0:0:0:0:1:47974
+2020-09-19 10:24:29,932 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@617] - Established session 0x174a4b02b0d0022 with negotiated timeout 40000 for client /0:0:0:0:0:0:0:1:47974
+2020-09-19 10:24:29,944 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory@197] - Accepted socket connection from /0:0:0:0:0:0:0:1:47976
+2020-09-19 10:24:29,944 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:ZooKeeperServer@868] - Client attempting to establish new session at /0:0:0:0:0:0:0:1:47976
+2020-09-19 10:24:29,946 [myid:] - INFO  [SyncThread:0:ZooKeeperServer@617] - Established session 0x174a4b02b0d0023 with negotiated timeout 40000 for client /0:0:0:0:0:0:0:1:47976
+2020-09-19 10:24:30,001 [myid:] - INFO  [SessionTracker:ZooKeeperServer@347] - Expiring session 0x174a4b02b0d0006, timeout of 40000ms exceeded
+2020-09-19 10:24:30,001 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@494] - Processed session termination for sessionid: 0x174a4b02b0d0006
+2020-09-19 10:24:30,157 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@494] - Processed session termination for sessionid: 0x174a4b02b0d0022
+2020-09-19 10:24:30,159 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1007] - Closed socket connection for client /0:0:0:0:0:0:0:1:47974 which had sessionid 0x174a4b02b0d0022
+2020-09-19 10:24:30,263 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@494] - Processed session termination for sessionid: 0x174a4b02b0d0023
+2020-09-19 10:24:30,267 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1007] - Closed socket connection for client /0:0:0:0:0:0:0:1:47976 which had sessionid 0x174a4b02b0d0023
+2020-09-19 10:24:37,635 [myid:] - WARN  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@357] - caught end of stream exception
+EndOfStreamException: Unable to read additional data from client sessionid 0x174a4b02b0d0021, likely client has closed socket
+	at org.apache.zookeeper.server.NIOServerCnxn.doIO(NIOServerCnxn.java:228)
+	at org.apache.zookeeper.server.NIOServerCnxnFactory.run(NIOServerCnxnFactory.java:208)
+	at java.lang.Thread.run(Thread.java:745)
+2020-09-19 10:24:37,635 [myid:] - INFO  [NIOServerCxn.Factory:0.0.0.0/0.0.0.0:2181:NIOServerCnxn@1007] - Closed socket connection for client /127.0.0.1:60754 which had sessionid 0x174a4b02b0d0021
+2020-09-19 10:25:12,000 [myid:] - INFO  [SessionTracker:ZooKeeperServer@347] - Expiring session 0x174a4b02b0d0021, timeout of 40000ms exceeded
+2020-09-19 10:25:12,001 [myid:] - INFO  [ProcessThread(sid:0 cport:-1)::PrepRequestProcessor@494] - Processed session termination for sessionid: 0x174a4b02b0d0021
