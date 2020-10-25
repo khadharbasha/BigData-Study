@@ -1,0 +1,521 @@
+create database if not exists custdb;
+use custdb;
+drop table if exists credits_pst;
+drop table if exists credits_cst;
+drop table if exists custmaster;
+
+create table if not exists credits_pst (
+id integer,
+lmt integer,
+sex integer,
+edu integer,
+marital integer,
+age integer,
+pay integer,
+billamt integer,
+defaulter integer,
+issuerid1 integer,
+issuerid2 integer,
+tz varchar(3));
+
+create table if not exists credits_cst (
+id integer,
+lmt integer,
+sex integer,
+edu integer,
+marital integer,
+age integer,
+pay integer,
+billamt integer,
+defaulter integer,
+issuerid1 integer,
+issuerid2 integer,
+tz varchar(3));
+
+create table if not exists custmaster (
+id integer,
+fname varchar(100),
+lname varchar(100),
+ageval integer,
+profession varchar(100));
+
+
+source /home/hduser/creditcard_insurance/2_2_creditcard_defaulters_pst
+source /home/hduser/creditcard_insurance/2_creditcard_defaulters_cst
+source /home/hduser/creditcard_insurance/custmaster
+
+HIVE
+=====
+1. Create a database in hive as insure.
+A. create database if not exists insure;
+
+2. Sqoop import the data into hive table insure.credits_pst and insure.credits_cst with options
+such as hive overwrite, number of mappers 2, where hive table created by sqoop with id as 
+bigint, billamt as float (this is do able with –map-column-hive option check the
+cookboo/online/project solution document if you can’t do it)
+
+A.
+create database if not exists insure;
+sqoop import --connect jdbc:mysql://localhost/custdb \
+--username root --password root \
+--table credits_cst \
+--split-by id \
+--hive-import \
+--create-hive-table --hive-table insure.credits_cst \
+--hive-overwrite \
+--map-column-hive id=bigint,billamt=float \
+--delete-target-dir --m 4;
+
+
+sqoop import --connect jdbc:mysql://localhost/custdb \
+--username root --password root \
+--table credits_pst \
+--split-by id \
+--hive-import \
+--create-hive-table --hive-table insure.credits_pst \
+--hive-overwrite \
+--map-column-hive id=bigint,billamt=float \
+--delete-target-dir --m 4;
+
+
+3. Filter the cst and pst tables with the billamt > 0 and union all both dataset and load into a
+single table called insure.cstpstreorder using create table as select (CTAS)
+
+create table cstpstreorder as 
+select * from credits_cst where billamt > 0 
+UNION ALL 
+select * from credits_pst where billamt > 0 
+
+
+4. Note: We can merge the step 2 and 3 and make the above 2 sqoop statements as 1 sqoop
+statement to directly import data into the insure.cstpstreorder by writing –query with billamt>0
+filter and union of both credits_pst and credits_cst at the MYSQL level itself finally convert the
+insure.cstpstreorder into external table. If you have some time try it out..
+
+sqoop import --connect jdbc:mysql://localhost/custdb \
+--username root --password root \
+--query select * from credits_cst where billamt > 0 UNION ALL select * from credits_pst where billamt > 0 where $conditions \
+--target-dir /user/hduser/tmp/cstpstreorder_sqoop \
+--delete-target-dir \
+--fields-terminated-by ; \
+--boundary-query select min(id) and max(id) from credits_cst \
+-m 1
+
+<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< not working >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>....
+
+
+5. Create another external table insure.cstpstpenality in orc file format (show create table
+insure.cstpstreorder) to get the ddl of the above table and alter as per the below columns for
+faster table creation and populate with the below ETL transformations applied in the above
+table cstpstreorder as given below 
+
+A. show create table cstpstreorder
+CREATE TABLE `cstpstreorder`(
+  `id` bigint,
+  `lmt` int,
+  `sex` int,
+  `edu` int,
+  `marital` int,
+  `age` int,
+  `pay` int,
+  `billamt` float,
+  `defaulter` int,
+  `issuerid1` int,
+  `issuerid2` int,
+  `tz` string)
+
+New table:
+CREATE external TABLE insure.cstpstpenality(
+ id bigint,
+ issuerid1 int,
+ issuerid2 int,
+ lmt int,
+ newlmt int,
+ sex int,
+ edu int,
+ marital int,
+ pay int,
+ billamt float,
+ newbillamt float,
+ defaulter int)
+ stored as orc
+location '/user/hduser/cstpstpenality';
+
+a. id,issuerid1,issuerid2,lmt,case defaulter when 1 then lmt-(lmt*0.04) else lmt end as
+newlmt ,sex,edu,marital,pay,billamt,case defaulter when 1 then billamt+(billamt*0.02) else
+billamt end as newbillamt, defaulter;
+
+Ans:
+insert into table cstpstpenality
+select id, issuerid1, issuerid2, lmt, 
+case
+   defaulter 
+   when
+      1 
+   then
+      lmt - (lmt*0.04) 
+   else
+      lmt 
+end
+as newlmt , 
+sex, edu, marital, pay, billamt, 
+case
+   defaulter 
+   when
+      1 
+   then
+      billamt + (billamt*0.02) 
+   else
+      billamt 
+end
+as newbillamt, 
+defaulter
+from cstpstreorder;
+
+
+b. Export and overwrite the above data into /user/hduser/defaultersout/ we will be using
+this defaultersout data in a later point of time and /user/hduser/nondefaultersout/
+locations with defaulter=1 and defaulter=0 respectively using ‘,’ delimiter. We will be
+sending this nondefaultersout data to external systems using Distcp/SFTP
+
+ans:
+----
+insert overwrite directory '/user/hduser/defaultersout/' 
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+select * from cstpstpenality where defaulter=1
+
+insert overwrite directory '/user/hduser/nondefaultersout/' 
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+select * from cstpstpenality where defaulter=0
+
+
+Q: Data Provisioning to the Consumers using DistCP
+Copy the data non defaulters data from one cluster (Prod) to another cluster (Non Prod) to
+/tmp/promocustomers location in hdfs for analytics purpose.
+
+ans: hdfs distcp /user/hduser/defaultersout/defaulter0 /tmp/promocustomers
+
+
+Q: 
+Execute the below shell script to pull the data from Cloud S3, validate, remove trailer data, move to
+HDFS and archive the data for backup.
+bash sfm_insuredata.sh https://s3.amazonaws.com/in.inceptez.bucket1/insurance_project/insuranceinfo.csv
+
+A: bash /home/hduser/creditcard_insurance/sfm_insuredata.sh https://s3.amazonaws.com/in.inceptez.bucket1/insurance_project/insuranceinfo.csv
+
+--2020-10-24 23:01:03--  https://s3.amazonaws.com/in.inceptez.bucket1/insurance_project/insuranceinfo.csv
+Resolving s3.amazonaws.com... 52.216.185.93
+Connecting to s3.amazonaws.com|52.216.185.93|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 414551 (405K) [text/csv]
+Saving to: “/tmp/clouddata/creditcard_insurance”
+
+100%[===================================================================================================================================================>] 414,551      409K/s   in 1.0s
+
+2020-10-24 23:01:06 (409 KB/s) - “/tmp/clouddata/creditcard_insurance” saved [414551/414551]
+
+trailer count is 3823
+file count is 3823
+Remove the trailer line in the file
+20/10/24 23:01:06 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+20/10/24 23:01:07 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+20/10/24 23:01:08 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+20/10/24 23:01:09 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+Data copied to HDFS successfully
+
+[hduser@Inceptez ~]$ cat /home/hduser/creditcard_insurance/sfm_insuredata.sh
+
+Ensure data is imported from cloud to hdfs and get the date and take a note of the timestamp in the
+file
+hadoop fs -ls /user/hduser/insurance_clouddata
+
+
+================================================================================================================================================
+Q: Copy the data non defaulters data from one cluster (Prod) to another cluster (Non Prod) to
+/tmp/promocustomers location in hdfs for analytics purpose.
+
+A: hadoop distcp /user/hduser/insurance_clouddata /tmp/promocustomers
+================================================================================================================================================
+HIVE
+====
+
+Create a hive table with header line count as 1 and load the insurance dataset.
+
+hive --service metastore
+
+hive
+
+create database if not exists insure;
+use insure;
+drop table if exists insurance;
+
+CREATE TABLE insurance (
+IssuerId1 int,
+IssuerId2 int,
+BusinessYear int,
+StateCode string,
+SourceName string,
+NetworkName string,
+NetworkURL string,
+RowNumber int,
+MarketCoverage string,
+DentalOnlyPlan string)
+row format delimited fields terminated by ','
+TBLPROPERTIES ("skip.header.line.count"="1");
+
+load data inpath '/user/hduser/insurance_clouddata' into table insurance;
+
+==============================================================================
+Create a partitioned table and load manually or by modifying the below script which has to generate
+the load command and it has to load the data into the below insurance table automatically.
+
+use insure;
+
+drop table insurance
+
+CREATE TABLE insurance 
+  ( 
+     issuerid1      INT, 
+     issuerid2      INT, 
+     businessyear   INT, 
+     statecode      STRING, 
+     sourcename     STRING, 
+     networkname    STRING, 
+     networkurl     STRING, 
+     rownumber      INT, 
+     marketcoverage STRING, 
+     dentalonlyplan STRING 
+  ) 
+Partitioned by (datadt date,hr int)
+row format delimited fields terminated by ','
+TBLPROPERTIES ("skip.header.line.count"="1");
+
+bash /home/hduser/creditcard_insurance/hivepart.sh /user/hduser/insurance_clouddata insure.insurance creditcard_insurance
+
+===============================================================================================================================
+
+Delete the invalid data with null issuerid1 and issuerid2 using insert select query
+<<provide your solution here to add the property to ignore the header record>>
+
+CREATE TABLE insurance_insert_select
+  ( 
+     issuerid1      INT, 
+     issuerid2      INT, 
+     businessyear   INT, 
+     statecode      STRING, 
+     sourcename     STRING, 
+     networkname    STRING, 
+     networkurl     STRING, 
+     rownumber      INT, 
+     marketcoverage STRING, 
+     dentalonlyplan STRING 
+  ) 
+row format delimited fields terminated by ','
+TBLPROPERTIES ("skip.header.line.count"="1");
+
+insert into table insurance_insert_select
+select * from insurance where issuerid1 is not null and issuerid2 is not null
+
+select count(*) from insurance_insert_select; = 3362
+select count(*) from insurance; = 3822
+select * from insurance where issuerid1 is null and issuerid2 is null = 459
+
+
+===============================================================================================================================	
+
+Create a fixed width hive table to load the fixed width states_fixedwidth data using Regex Serde
+
+drop table if exists insure.state_master;
+
+CREATE EXTERNAL TABLE insure.state_master (statecd STRING, statedesc STRING)
+ROW FORMAT SERDE 'org.apache.hadoop.hive.contrib.serde2.RegexSerDe'
+WITH SERDEPROPERTIES ("input.regex" = "(.{2})(.{20}).*" )
+LOCATION '/user/hduser/states';
+
+load data local inpath '/home/hduser/creditcard_insurance/states_fixedwidth' overwrite into table insure.state_master;
+
+select * from insure.state_master limit 5;
+
+===================================================================================================================================
+Create a managed table on top of the hive output defaulter’s dataset created above.
+
+use insure;
+CREATE TABLE defaulters 
+  ( 
+     id         INT, 
+     issuerid1  INT, 
+     issuerid2  INT, 
+     lmt        INT, 
+     newlmt     DOUBLE, 
+     sex        INT, 
+     edu        INT, 
+     marital    INT, 
+     pay        INT, 
+     billamt    INT, 
+     newbillamt FLOAT, 
+     defaulter  INT 
+  ) 
+row format delimited fields terminated by ','
+LOCATION '/user/hduser/defaultersout';
+
+
+Create a final managed table (later convert to external table) in orc with snappy compression and load
+the above 2 tables joined by applying different functions as given below .
+
+This table should not allow duplicates when it is empty or if not using overwrite option.
+
+use insure;
+
+CREATE TABLE insurancestg 
+  ( 
+     issuerid       INT, 
+     businessyear   INT, 
+     statecode      STRING, 
+     statedesc      STRING, 
+     sourcename     STRING, 
+     networkname    STRING, 
+     networkurl     STRING, 
+     rownumber      INT, 
+     marketcoverage STRING, 
+     dentalonlyplan STRING, 
+     id             INT, 
+     lmt            INT, 
+     newlmt         INT, 
+     reduced_lmt    INT, 
+     sex            VARCHAR(6), 
+     grade          VARCHAR(20), 
+     marital        INT, 
+     pay            INT, 
+     billamt        INT, 
+     newbillamt     FLOAT, 
+     penality       FLOAT, 
+     defaulter      INT 
+  ) 
+row format delimited fields terminated by ','
+LOCATION '/user/hduser/insurancestg';
+
+
+insert into table insurancestg
+SELECT Concat(i.issuerid1, i.issuerid2) AS issuerid, 
+       i.businessyear, 
+       i.statecode, 
+       s.statedesc                      AS statedesc, 
+       i.sourcename, 
+       i.networkname, 
+       i.networkurl, 
+       i.rownumber, 
+       i.marketcoverage, 
+       i.dentalonlyplan, 
+       d.id, 
+       d.lmt, 
+       d.newlmt, 
+       d.newlmt - d.lmt                 AS reduced_lmt, 
+       CASE 
+         WHEN d.sex = 1 THEN 'male' 
+         ELSE 'female' 
+       END                              AS sex, 
+       CASE 
+         WHEN d.edu = 1 THEN 'lower grade' 
+         WHEN d.edu = 2 THEN 'lower middle grade' 
+         WHEN d.edu = 3 THEN 'middle grade' 
+         WHEN d.edu = 4 THEN 'higher grade' 
+         WHEN d.edu = 5 THEN 'doctrate grade' 
+       END                              AS grade, 
+       d.marital, 
+       d.pay, 
+       d.billamt, 
+       d.newbillamt, 
+       d.newbillamt - d.billamt         AS penality, 
+       d.defaulter 
+FROM   insurance i 
+       INNER JOIN defaulters d 
+               ON ( i.issuerid1 = d.issuerid1 
+                    AND i.issuerid2 = d.issuerid2 ) 
+       INNER JOIN state_master s 
+               ON ( i.statecode = s.statecd );
+
+ select count(*) from insurancestg = 14422
+ 
+ ================================================================
+dfs -rm -r -f /user/hduser/insuranceorc;
+
+drop table if exists insuranceorc;
+
+CREATE TABLE insuranceorc 
+  ( 
+     issuerid       INT, 
+     businessyear   INT, 
+     statecode      STRING, 
+     statedesc      STRING, 
+     sourcename     STRING, 
+     networkname    STRING, 
+     networkurl     STRING, 
+     rownumber      INT, 
+     marketcoverage STRING, 
+     dentalonlyplan STRING, 
+     id             INT, 
+     lmt            INT, 
+     newlmt         INT, 
+     reduced_lmt    INT, 
+     sex            VARCHAR(6), 
+     grade          VARCHAR(20), 
+     marital        INT, 
+     pay            INT, 
+     billamt        INT, 
+     newbillamt     FLOAT, 
+     penality       INT, 
+     defaulter      INT 
+  )  
+row format delimited fields terminated by ','
+STORED AS ORC
+LOCATION '/user/hduser/insuranceorc'
+TBLPROPERTIES ("immutable"="true");
+
+Insert into insuranceorc select * from insurancestg where issuerid is not null;
+
+select count(*) from insuranceorc; = 2335 ; 
+
+
+==================================================================
+Convert the above table from managed to external, usually we use the below statement if we can’t
+create external table in the initial stage itself for example sqoop import hive table can’t be created as
+external initially
+
+before: desc formatted insuranceorc;
+Location:               hdfs://localhost:54310/user/hduser/insuranceorc
+Table Type:             MANAGED_TABLE
+
+alter table insuranceorc SET TBLPROPERTIES('EXTERNAL'='TRUE');
+
+after : desc formatted insuranceorc;
+Location:               hdfs://localhost:54310/user/hduser/insuranceorc
+Table Type:             EXTERNAL_TABLE
+
+================================================================================
+
+q: write common table expression queries in hive
+
+WITH t1 
+     AS (SELECT Max(penality) AS penalitymale 
+         FROM   insuranceorc 
+         WHERE  sex = 'male'), 
+     t2 
+     AS (SELECT Max(penality) AS penalityfemale 
+         FROM   insuranceorc 
+         WHERE  sex = 'female') 
+SELECT penalitymale, 
+       penalityfemale 
+FROM   t1 
+       INNER JOIN t2 
+               ON 1 = 1; 
+			   
+penalitymale    penalityfemale
+8718    5779
+
+================================================================================		   
+
+
+
+
+
+
