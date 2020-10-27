@@ -513,6 +513,373 @@ penalitymale    penalityfemale
 8718    5779
 
 ================================================================================		   
+Data Governance - Redaction and Masking using Hive and Python
+================================================================================
+create view in hive to restrict few columns, store queries, and apply some masking on sensitive
+columns using either query or by using the mask_insure.py function given in the project document.
+
+drop view if exists middlegradeview;
+
+CREATE VIEW middlegradeview 
+AS 
+  SELECT issuerid, 
+         businessyear, 
+         statedesc, 
+         sourcename, 
+         sex, 
+         grade, 
+         marital, 
+         newbillamt, 
+         defaulter, 
+         Translate(Translate(Translate(Translate(Translate(networkurl, 'a', 'x') 
+                                       , 
+                                       'b', 
+                                       'y'), 'c', 
+                                       'z'), 's', 'r'), '.com', '.aaa') AS 
+         maskednetworkurl 
+  FROM   insuranceorc 
+  WHERE  grade = 'middle grade' 
+         AND issuerid IS NOT NULL;
+
+select * from middlegradeview;  ==> 496 rows;
+
+select issuerid, defaulter, maskednetworkurl from middlegradeview where issuerid=1620416204;
+
+issuerid        defaulter       maskednetworkurl
+1620416204      1       http://ahiappazannezt.zaa/praviderrexrzh.xrpx
+1620416204      1       http://ahiappazannezt.zaa/praviderrexrzh.xrpx
+1620416204      1       http://inhexlthahia.arg/yau-need-ta-knaw/pravider-netwark
+
+select issuerid, defaulter, networkurl from insuranceorc  where issuerid=1620416204;
+
+issuerid        defaulter       networkurl
+1620416204      1       http://ohioppoconnect.com/providersearch.aspx
+1620416204      1       http://ohioppoconnect.com/providersearch.aspx
+1620416204      1       http://ohioppoconnect.com/providersearch.aspx
+1620416204      1       http://ohioppoconnect.com/providersearch.aspx
+1620416204      1       http://ohioppoconnect.com/providersearch.aspx
+1620416204      1       http://ohioppoconnect.com/providersearch.aspx
+1620416204      1       http://ohioppoconnect.com/providersearch.aspx
+1620416204      1       http://ohioppoconnect.com/providersearch.aspx
+1620416204      1       http://inhealthohio.org/you-need-to-know/provider-network
+1620416204      1       http://inhealthohio.org/you-need-to-know/provider-network
+1620416204      1       http://inhealthohio.org/you-need-to-know/provider-network
+1620416204      1       http://inhealthohio.org/you-need-to-know/provider-network
+
+==================================================================================================================
+CREATE VIEW middlegradeview_python                                                
+ AS 
+ SELECT transform(issuerid,businessyear,statedesc,sourcename, defaulter ,networkurl) 
+ using 'python /home/hduser/mask_insure.py'
+ AS (issuerid,businessyear,statedesc,sourcename, defaulter ,maskednetworkurl)
+ FROM   insuranceorc 
+ WHERE  grade='middle grade' 
+ AND    issuerid IS NOT NULL;
+
+select issuerid, defaulter, maskednetworkurl from middlegradeview_python where issuerid=1620416204;
+issuerid        defaulter       maskednetworkurl
+1620416204      1       e6f0002784b4f068db8900bbc633c76f79af087843ef93187f616b47b8375f66
+1620416204      1       e6f0002784b4f068db8900bbc633c76f79af087843ef93187f616b47b8375f66
+1620416204      1       e18a8fd6e9db60888beee0ef78acf2e5e4b7a23eb022c72ec1bc6b4949dca4cb
+
+
+Python:
+=========
+#!/usr/bin/env python
+#!/usr/bin/env python
+import sys
+import string
+import hashlib
+
+while True:
+        line = sys.stdin.readline()
+        if not line:
+                break
+        line = string.strip(line, "\n ")
+        issuerid,businessyear,statedesc,sourcename, defaulter ,networkurl = string.split(line, "\t")
+        print "\t".join([issuerid,businessyear,statedesc,sourcename,defaulter,hashlib.sha256(networkurl).hexdigest()])
+
+==================================================================================================================
+Export the above view data into hdfs location /user/hduser/defaulterinfo with the pipe ‘|’ delimiter the following columns
+issuerid,businessyear,statedesc,sourcename,maskednetworkurl,sex,grade,marital,newbillamt,defaulter
+
+	insert overwrite directory '/user/hduser/defaulterinfo'
+	row format delimited
+	fields terminated by '|'
+	SELECT issuerid, 
+		   businessyear, 
+		   statedesc, 
+		   sourcename, 
+		   maskednetworkurl, 
+		   sex, 
+		   grade, 
+		   marital, 
+		   newbillamt, 
+		   defaulter 
+	FROM   middlegradeview	   
+
+==================================================================================================================
+Data Provisioning to the Consumers into legacy Databases using Sqoop
+including Validation
+=====================================================================
+Data export using Sqoop into DB
+
+Export the above data into mysql using sqoop
+
+mysql -u root -p
+password: root
+
+use custdb;
+<!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! columns not matching !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!>
+
+drop table if exists middlegrade;
+
+hive
+-----
+insert overwrite directory '/user/hduser/defaulterinfo_mysql'
+row format delimited
+fields terminated by '|'
+SELECT issuerid, 
+   businessyear, 
+   statedesc, 
+   sourcename, 
+   defaulter, 
+   maskednetworkurl
+FROM   middlegradeview	   
+
+CREATE TABLE middlegrade 
+  ( 
+     issuerid         INTEGER, 
+     businessyear     INTEGER, 
+     maskedstatedesc  VARCHAR(200), 
+     maskedsourcename VARCHAR(100), 
+     defaulter        VARCHAR(20), 
+     maskednetworkurl VARCHAR(200) 
+  ); 
+  
+sqoop export --connect jdbc:mysql://localhost/custdb \
+--username root \
+--password root \
+--export-dir /user/hduser/defaulterinfo_mysql \
+--table middlegrade \
+--fields-terminated-by "|" \
+--num-mappers 2  --validate
+
+======================================================================================================================
+Complex type ETL using Hive
+======================================================================================================================
+Create a Complex type table to understand how to group the like issuers in a single row using array,
+struct and map.
+
+Drop table if exists insuranceorc_collection ;
+
+Create table insuranceorc_collection
+row format delimited collection items terminated by ','
+stored as orcfile
+location '/user/hduser/insuranceorc_collection/' as
+SELECT issuerid, 
+       Named_struct('marital', marital, 'sex', sex, 'grade', grade) AS personalinfo, 
+       Collect_set(networkname)                                     AS networkname, 
+       Collect_set(networkurl)                                      AS networkurl 
+FROM   insuranceorc 
+GROUP  BY issuerid, 
+          Named_struct('marital', marital, 'sex', sex, 'grade', grade);
+
+alter table insuranceorc_collection SET TBLPROPERTIES('EXTERNAL'='TRUE');
+
+Select only the issuerid,grade,second networkname,second networkurl where we have more than 1
+networkname and networkurl accessed by the customers
+
+SELECT issuerid, 
+       personalinfo.grade, 
+       networkname[1], 
+       networkurl [1] 
+FROM   insuranceorc_collection 
+WHERE  Size(networkname) > 1 
+       AND Size(networkurl) > 1 
+
+Ans: Fetched: 144 row(s)
+
+======================================================================================================================
+hbase shell
+================
+create 'custmaster', 'customer'
+
+1. Import using sqoop from db into hbase custmaster data and save the output log into a log file.
+
+sqoop import --connect jdbc:mysql://localhost/custdb \
+--username root --password root \
+--table custmaster \
+--hbase-table  custmaster \
+--column-family customer \
+--hbase-row-key id \
+--hbase-bulkload \
+--split-by id \
+--m 3 \
+--delete-target-dir 2>&1 | tee -a sqooplog.log
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!! use 2>&1 | tee -a sqooplog.log to enable logging !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+======================================================================================================================
+Create a hbase handler table in hive using hbase storage handler referring to insurancehive table that
+will be automatically created in hbase with insurance and credit card column families when we create
+the below hive table.
+
+Use insure;
+drop table if exists insurancehive;
+
+CREATE TABLE insurancehive 
+  ( 
+     idkey        INT, 
+     issuerid     INT, 
+     id           INT, 
+     businessyear INT, 
+     statedesc    STRING, 
+     networkurl   STRING, 
+     pay          INT, 
+     defaulter    STRING, 
+     billamt      INT, 
+     newbillamt   FLOAT, 
+     penality     FLOAT 
+  ) 
+STORED BY 'org.apache.hadoop.hive.hbase.HBaseStorageHandler' 
+WITH SERDEPROPERTIES("hbase.columns.mapping"=":key,
+insurance:issuerid,
+insurance:id,
+insurance:businessyear,
+insurance:statedesc,
+insurance:networkurl,
+creditcard:pay,
+creditcard:defaulter,
+creditcard:billamt,
+creditcard:newbillamt,
+creditcard:penality")
+TBLPROPERTIES ("hbase.table.name" = "insurancehive",
+"hbase.mapred.output.outputtable"="insurancehive");
+
+
+========================================> insurancehive will be created in HBase
+
+Insert incremental rowkey as the row_key into HBASE.
+
+insert into table insurancehive 
+SELECT Row_number() OVER() AS idkey, 
+       issuerid, 
+       id, 
+       businessyear, 
+       statedesc, 
+       networkurl, 
+       pay, 
+       defaulter, 
+       billamt, 
+       newbillamt, 
+       penality 
+FROM   insuranceorc 
+WHERE  issuerid IS NOT NULL;
+
+There records are automatically loded in hive as well as hbase  ==> 2335 in hive | 2335 row(s) in 7.9640 seconds in HBASE
+==========================================================================================================================
+Data Provisioning to the Consumers using Apache Phoenix to support
+Realtime aggregation and Low Latency Query processing
+---------------------------------------------------------------------------------------
+Create a phoenix table view on the above hbase table and analyze profession based total
+payment and average payment.
+----------------------------------------------------------------------------------------
+
+sqlline.py localhost
+
+!set maxwidth 1000
+
+drop view if exists "insurancehive";
+
+CREATE VIEW "insurancehive" 
+            ( 
+                        idkey                      varchar(100) PRIMARY KEY, 
+                        "insurance"."issuerid"     varchar, 
+                        "insurance"."id"           varchar, 
+                        "insurance"."businessyear" varchar, 
+                        "insurance"."statedesc"    varchar, 
+                        "insurance"."networkurl"   varchar, 
+                        "creditcard"."pay"         varchar, 
+                        "creditcard"."defaulter"   varchar, 
+                        "creditcard"."billamt"     varchar, 
+                        "creditcard"."newbillamt"  varchar, 
+                        "creditcard"."penality"    varchar 
+            )
+;
+
+drop view if exists "custmaster";
+
+CREATE VIEW "custmaster" 
+            ( 
+                        id                      varchar PRIMARY KEY, 
+                        "customer"."fname"      varchar, 
+                        "customer"."lname"      varchar, 
+                        "customer"."profession" varchar, 
+                        "customer"."ageval"     varchar 
+            );
+			
+------------------------------------------------------------------------------------------------------
+Write queries to build cubes at different levels to aggregate the data in realtime to populate in the
+report such as average age, sum of bill amount, average bill amount etc.,
+------------------------------------------------------------------------------------------------------
+select next value for cubeseq as id,lvl, avg_age, sum_billamt, avg_billamt, avg_newbillamt from (
+select 1 as lvl,"profession",avg(cast(to_number("ageval") as integer)) as avg_age ,0 as sum_billamt,0 as
+avg_billamt,0 as avg_newbillamt
+from "custmaster"
+group by lvl,"profession"
+union all
+select 2 as lvl,"profession", cast(to_number("ageval") as integer) as avg_age ,0 as sum_billamt,0 as
+avg_billamt,0 as avg_newbillamt
+from "custmaster"
+union all
+select 3 as lvl,"custmaster"."profession",0 as avg_age,sum(cast(to_number("insurancehive"."billamt") as
+bigint)) as sum_billamt,avg(cast(to_number("insurancehive"."newbillamt") as double)) as avg_billamt,
+avg(cast(to_number("insurancehive"."newbillamt") as double)) as avg_newbillamt
+from "insurancehive" as i inner join "custmaster" as c
+on "insurancehive"."id"=c.id
+group by "custmaster"."profession") as temp
+order by lvl;			
+	
+SELECT next value FOR cubeseq AS id, 
+       lvl, 
+       avg_age, 
+       sum_billamt, 
+       avg_billamt, 
+       avg_newbillamt 
+FROM   (SELECT 1                                         AS lvl, 
+               "profession", 
+               Avg(Cast(To_number("ageval") AS INTEGER)) AS avg_age, 
+               0                                         AS sum_billamt, 
+               0                                         AS avg_billamt, 
+               0                                         AS avg_newbillamt 
+        FROM   "custmaster" 
+        GROUP  BY lvl, 
+                  "profession" 
+        UNION ALL 
+        SELECT 2                                    AS lvl, 
+               "profession", 
+               Cast(To_number("ageval") AS INTEGER) AS avg_age, 
+               0                                    AS sum_billamt, 
+               0                                    AS avg_billamt, 
+               0                                    AS avg_newbillamt 
+        FROM   "custmaster" 
+        UNION ALL 
+        SELECT 3 AS lvl, 
+               "custmaster"."profession", 
+               0                                                            AS 
+               avg_age, 
+               Sum(Cast(To_number("insurancehive"."billamt") AS BIGINT))    AS 
+               sum_billamt, 
+               Avg(Cast(To_number("insurancehive"."newbillamt") AS DOUBLE)) AS 
+               avg_billamt, 
+               Avg(Cast(To_number("insurancehive"."newbillamt") AS DOUBLE)) AS 
+               avg_newbillamt 
+        FROM   "insurancehive" AS i 
+               INNER JOIN "custmaster" AS c 
+                       ON "insurancehive"."id" = c.id 
+        GROUP  BY "custmaster"."profession") AS temp 
+ORDER  BY lvl; 	
 
 
 
