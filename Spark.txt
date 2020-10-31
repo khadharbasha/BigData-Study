@@ -1,0 +1,6 @@
+-----------------------------------------------------
+					Spark
+-----------------------------------------------------
+Q: What happens to the spark job when its submitted
+A: Go thru the YARN architecture, it works the same way. App Master
+
