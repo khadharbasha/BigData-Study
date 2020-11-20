@@ -1,0 +1,377 @@
+Run the below sqls to create and load data in the tables created in the below schemas
+
+ordersproduct_ORIG.sql - Schema: ordersproducts, Tables: orders, products, orderdetails
+
+custpayments_ORIG.sql - Schema: custpayments, Tables: custpayments and paymentspayments
+
+empoffice.sql - Schema: empoffice, Tables: employees and offices
+
+source /home/hduser/retailorders/ordersproduct_ORIG.sql
+source /home/hduser/retailorders/custpayments_ORIG.sql
+source /home/hduser/retailorders/empoffice.sql 
+
+
+
+Raw Layer:
+SQOOP:
+Rather than passing password inline with the sqoop command, create a password file adding
+root as password:
+echo -n "root" > ~/root.password 
+
+
+Create the below directories in hdfs and place the password file
+hadoop fs -mkdir /user/hduser/retailorders/
+hadoop fs -put ~/root.password /user/hduser/retailorders/root.password
+hadoop dfs -chown 400 /user/hduser/retailorders/root.password 
+
+Run the below Sqoop import commands with options file, password file, boundary query, query, split by, delete
+target directory, direct mode, ~ delimiter, reading without splitby column with primary key as split by
+========================================================
+Import the employees table from the DB –
+========================================================
+Change the last value according to the data present in the upddt column of employees table in MYSQL, this is to
+later automate the process.
+cat /home/hduser/retailorders/empofficeoption \
+import
+--connect
+jdbc:mysql://localhost/empoffice
+--username
+root
+
+
+sqoop --options-file /home/hduser/retailorders/empofficeoption \
+--password-file /user/hduser/retailorders/root.password \
+-table employees \
+-m 4 \
+--target-dir /user/hduser/retailorders/employees \
+-fields-terminated-by '~' \
+--lines-terminated-by '\n' \
+--incremental lastmodified \
+--check-column upddt \
+--last-value '2020-10-01' \
+--merge-key employeenumber; 
+
+RESULT ==> hdfs dfs -ls -R /user/hduser/retailorders/employees
+
+sqoop create-hive-table --connect jdbc:mysql://127.0.0.1/empoffice \
+--username root --password root \
+--table employees \
+--hive-table retailstg.employees --fields-terminated-by '~';
+
+hive command 
+-------------
+load data inpath '/user/hduser/retailorders/employees' overwrite into table retailstg.employees; 
+
+========================================================
+Import the offices table from the DB
+========================================================
+cat /home/hduser/retailorders/empofficeoption
+import
+--connect
+jdbc:mysql://localhost/empoffice
+--username
+root
+
+sqoop --options-file /home/hduser/retailorders/empofficeoption \
+--password-file /user/hduser/retailorders/root.password \
+-table offices \
+-m 1 \
+--delete-target-dir \
+--target-dir /user/hduser/retailorders/offices/ --fields-terminated-by '~' --lines-terminated-by '\n'
+
+sqoop create-hive-table --connect jdbc:mysql://127.0.0.1/empoffice \
+--username root --password root \
+--table offices --hive-table retailstg.offices \
+--fields-terminated-by '~'
+
+hive command 
+-------------
+load data inpath '/user/hduser/retailorders/offices' overwrite into table retailstg.offices;
+
+================================================================================================================
+Import the Customer and payments data joined with most of the options used for better optimization and best
+practices
+================================================================================================================
+cat /home/hduser/retailorders/custoption 
+
+import
+--connect
+jdbc:mysql://localhost/custpayments
+--username
+root
+
+sqoop --options-file /home/hduser/retailorders/custoption \
+--password-file /user/hduser/retailorders/root.password \
+--boundary-query " select min(customerNumber), max(customerNumber) from payments " \
+--query 'select 
+c.customerNumber,
+upper(c.customerName),
+c.contactFirstName,
+c.contactLastName,
+c.phone,
+c.addressLine1,
+c.city,
+c.state,
+c.postalCode,
+c.country,
+c.salesRepEmployeeNumber,
+c.creditLimit,
+p.checknumber,
+p.paymentdate,
+p.amount 
+from customers c 
+inner join payments p 
+on c.customernumber=p.customernumber 
+and year(p.paymentdate)=2020
+and month(p.paymentdate)=10 where $CONDITIONS' \
+--split-by c.customernumber \
+--delete-target-dir \
+--target-dir custdetails/2020-10/ --null-string 'NA' \
+--direct \
+--num-mappers 2 \
+--fields-terminated-by '~' \
+--lines-terminated-by '\n'; 
+
+Result:
+20/11/20 19:31:02 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+drwxr-xr-x   - hduser hadoop          0 2020-11-20 19:29 custdetails/2020-10
+-rw-r--r--   1 hduser hadoop          0 2020-11-20 19:29 custdetails/2020-10/_SUCCESS
+-rw-r--r--   1 hduser hadoop      22225 2020-11-20 19:29 custdetails/2020-10/part-m-00000
+-rw-r--r--   1 hduser hadoop      15871 2020-11-20 19:29 custdetails/2020-10/part-m-00001
+
+================================================================================================================
+Import the orders, orderdetail and products data joined with most of the options used for better optimization
+and best practices
+================================================================================================================
+[hduser@Inceptez ~]$ cat /home/hduser/retailorders/ordersoption
+import
+--connect
+jdbc:mysql://localhost/ordersproducts
+--username
+root
+
+
+sqoop --options-file /home/hduser/retailorders/ordersoption \
+--password-file /user/hduser/retailorders/root.password \
+--boundary-query "select min(customerNumber), max(customerNumber) from orders" \
+--query 'select
+   o.customernumber,
+   o.ordernumber,
+   o.orderdate,
+   o.shippeddate,
+   o.status,
+   o.comments,
+   od.productCode as pd,
+   od.quantityOrdered,
+   od.priceEach,
+   od.orderLineNumber,
+   p.productCode,
+   p.productName,
+   p.productLine,
+   p.productScale,
+   p.productVendor,
+   p.productDescription,
+   p.quantityInStock,
+   p.buyPrice,
+   p.MSRP 
+from
+   orders o 
+   inner join
+      orderdetails od 
+      on o.ordernumber = od.ordernumber 
+   inner join
+      products p 
+      on od.productCode = p.productCode 
+      and year(o.orderdate) = 2020 
+      and month(o.orderdate) = 10 where $CONDITIONS' \
+--split-by o.customernumber \
+--delete-target-dir \
+--target-dir orderdetails/2020-10/ \
+--null-string 'NA' \
+--direct --num-mappers 4 \
+--fields-terminated-by '~' \
+--lines-terminated-by '\n'; 
+
+Result:
+[hduser@Inceptez ~]$ hdfs dfs -ls -R /user/hduser/orderdetails/2020-10/
+
+
+================================================================================================================================================
+HIVE:
+Start Hive metastore in a terminal:
+hive --service metastore
+Start hive cli in another terminal:
+hive
+
+
+Load the cust and order details data into hive tables from the above sqoop imported location.
+2. Convert the custdetails data into complex data types (struct in hive).
+1. Managed Table use case: Under staging retailstg Database create temporary managed tables, Load the
+sqoop imported data into the below managed table that will be dropped and recreated on daily basis so
+data will be cleaned when dropped, if we use external table we have to manage the data cleanup
+separately as given below using the truncate statement. 
+
+
+Managed Table use case: Under staging retailstg Database create temporary managed tables, Load the
+sqoop imported data into the below managed table that will be dropped and recreated on daily basis so
+data will be cleaned when dropped, if we use external table we have to manage the data cleanup
+separately as given below using the truncate statement.
+
+create database retailstg;
+use retailstg; 
+
+CREATE TABLE custdetails_raw 
+  ( 
+     customernumber         STRING, 
+     customername           STRING, 
+     contactfirstname       STRING, 
+     contactlastname        STRING, 
+     phone                  BIGINT, 
+     addressline1           STRING, 
+     city                   STRING, 
+     state                  STRING, 
+     postalcode             BIGINT, 
+     country                STRING, 
+     salesrepemployeenumber STRING, 
+     creditlimit            FLOAT, 
+     checknumber            STRING, 
+     paymentdate            DATE, 
+     checkamt               FLOAT 
+  ) 
+row format delimited fields terminated by '~'
+location '/user/hduser/custdetails/2020-10';
+
+
+CREATE TABLE orddetstg 
+  ( 
+     customernumber     STRING, 
+     ordernumber        STRING, 
+     orderdate          DATE, 
+     shippeddate        DATE, 
+     status             STRING, 
+     comments           STRING, 
+     quantityordered    INT, 
+     priceeach          DECIMAL(10, 2), 
+     orderlinenumber    INT, 
+     productcode        STRING, 
+     productname        STRING, 
+     productline        STRING, 
+     productscale       STRING, 
+     productvendor      STRING, 
+     productdescription STRING, 
+     quantityinstock    INT, 
+     buyprice           DECIMAL(10, 2), 
+     msrp               DECIMAL(10, 2) 
+  ) 
+row format delimited fields terminated by '~'
+location '/user/hduser/orderdetails/2020-10/';
+
+
+To run the above statements one after another by running outside hive cli ie from the linux terminal:
+hive -e "use retailstg; drop table if exists custdetstgcured;"
+
+
+Run the above hive queries as a batch hql job: create a hql file and copy all the above lines and run the hql
+script.
+cd ~/retailorders
+
+vi staging_tbls.hql
+
+create database if not exists retailstg;
+
+use retailstg; 
+
+CREATE TABLE if not exists custdetails_raw 
+  ( 
+     customernumber         STRING, 
+     customername           STRING, 
+     contactfirstname       STRING, 
+     contactlastname        STRING, 
+     phone                  BIGINT, 
+     addressline1           STRING, 
+     city                   STRING, 
+     state                  STRING, 
+     postalcode             BIGINT, 
+     country                STRING, 
+     salesrepemployeenumber STRING, 
+     creditlimit            FLOAT, 
+     checknumber            STRING, 
+     paymentdate            DATE, 
+     checkamt               FLOAT 
+  ) 
+row format delimited fields terminated by '~'
+location '/user/hduser/custdetails/2020-10';
+
+CREATE TABLE custdetstgcured 
+             ( 
+                          customernumber STRING, 
+                          customername STRING, 
+                          contactfullname STRING, 
+                          address STRUCT<ADDRESSLINE1:string,CITY:string,STATE:string,POSTALCODE:bigint,COUNTRY:string,PHONE:bigint>,
+                          creditlimit float, 
+                          checknum string, 
+                          checkamt float, 
+                          paymentdate date 
+             )
+row format delimited fields terminated by '~'
+stored as textfile;
+
+
+insert overwrite table custdetstgcured SELECT customernumber, 
+       contactfirstname, 
+       Concat(contactfirstname, ' ', contactlastname), 
+       Named_struct('addressLine1', addressline1, 'city', city, 'state', state, 
+       'postalCode', postalcode, 'country', country, 'phone', phone), 
+       creditlimit, 
+       checknumber, 
+       checkamt, 
+       paymentdate 
+FROM   custdetails_raw;
+
+truncate table orddetstg;
+
+CREATE External TABLE if not exists orddetstg 
+  ( 
+     customernumber     STRING, 
+     ordernumber        STRING, 
+     orderdate          DATE, 
+     shippeddate        DATE, 
+     status             STRING, 
+     comments           STRING, 
+     quantityordered    INT, 
+     priceeach          DECIMAL(10, 2), 
+     orderlinenumber    INT, 
+     productcode        STRING, 
+     productname        STRING, 
+     productline        STRING, 
+     productscale       STRING, 
+     productvendor      STRING, 
+     productdescription STRING, 
+     quantityinstock    INT, 
+     buyprice           DECIMAL(10, 2), 
+     msrp               DECIMAL(10, 2) 
+  ) 
+row format delimited fields terminated by '~'
+location '/user/hduser/orderdetails/2020-10/';
+
+
+
+hive -f /home/hduser/retailorders/staging_tbls_basha.hql 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
