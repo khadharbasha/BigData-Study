@@ -4,3 +4,14 @@
 Q: What happens to the spark job when its submitted
 A: Go thru the YARN architecture, it works the same way. App Master
 
+
+total bill = 3180
+your share = 3180 / 2  = 1590
+I bought house in Aug 2018, second half of 2018 so 1590-530 = 1060
+
+I will have to pay you 1060, correct ?
+
+
+https://docs.microsoft.com/en-us/users/msusdev/collections/4w0nu7r1e0q1p1
+
+https://www.microsoft.com/en-us/cloudskillschallenge/Public/Contests/6e453281-0077-4a58-8db7-669d13bfd5bd
