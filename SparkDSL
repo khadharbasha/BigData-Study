@@ -1,0 +1,123 @@
+DSL(domain-specific language):
+------------------------------
+****
+**** Transformation
+****
+----------------------------------
+select(columns):
+----------------------------------
+val df = spark.read
+.option("inferSchema","true")
+.format("csv")
+.load("file:D/BigData/spark-essentials-master/src/main/resources/data/movies.csv")
+
+val df = spark.read.option("inferSchema","true").option("header","true").format("csv").load("file:///D:/BigData/spark-essentials-master/src/main/resources/data/movies.csv") 
+
+df.select('actor, 'year).show(5)
+df.select('actor, ('year - ('year %10)).as('decade)).show(5)
+
+
+----------------------------------
+selectExpr(columns):
+----------------------------------
+Select * ==> df.selectExpr("*").show(5)
+df.selectExpr("title as movie_name").show(5)
+df.selectExpr("title as movie_name").show(5)
+
+----------------------------------
+filler(condition)
+where(condition)
+----------------------------------
+It is used to filter out the rows that don’t meet the given condition
+filter ==> returns only the rows that meet the specified condition
+
+df.filter('year < 2000)
+df.filter('year === 2000).show()
+df.filter('year =!= 2000).show
+
+----------------------------------
+distinct, dropDuplicates
+----------------------------------
+dropDuplicates allows you to control which columns should be used in deduplication logic. 
+If none is specified, the deduplication logic will use all the columns in the DataFrame
+
+df.select("title").distinct.selectExpr("count(title) as movies").show
+
+df.dropDuplicates("title").selectExpr("count(title) as movies").show
+
+------------------------------------------------------------------------------------------------------
+withColumn(colName, column)
+------------------------------------------------------------------------------------------------------
+add a new column to a DataFrame. It requires two input parameters: a column name and a value in the form of a column expression
+
+df.printSchema()
+ |-- actor: string (nullable = true)
+ |-- title: string (nullable = true)
+ |-- year: integer (nullable = true)
+ 
+df.withColumn("decade", ('year - 'year % 10)).show(5)
++-----------------+-------------+----+------+
+|            actor|        title|year|decade|
++-----------------+-------------+----+------+
+|McClure, Marc (I)|Freaky Friday|2003|  2000|
+|McClure, Marc (I)| Coach Carter|2005|  2000|
+|McClure, Marc (I)|  Superman II|1980|  1980|
+|McClure, Marc (I)|    Apollo 13|1995|  1990|
+|McClure, Marc (I)|     Superman|1978|  1970|
++-----------------+-------------+----+------+
+
+scala> val df1 = df.withColumn("decade", ('year - 'year % 10))
+df1: org.apache.spark.sql.DataFrame = [actor: string, title: string ... 2 more fields]
+
+scala> df.printSchema
+root
+ |-- actor: string (nullable = true)
+ |-- title: string (nullable = true)
+ |-- year: integer (nullable = true)
+
+
+scala> df1.printSchema
+root
+ |-- actor: string (nullable = true)
+ |-- title: string (nullable = true)
+ |-- year: integer (nullable = true)
+ |-- decade: integer (nullable = true)
+ 
+------------------------------------------------------------------------------------------------------
+ withColumnRenamed(existingColName, newColName)
+------------------------------------------------------------------------------------------------------
+This transformation is strictly about renaming an existing column name in a DataFrame
+	To rename a cryptic column name to a more human-friendly nam
+	Before joining two DataFrames that happen to have one or more same column name
+
+nOte:Notice that if the provided existingColName doesn’t exist in the schema, Spark doesn’t throw an error, and it will silently do nothing	
+
+df1.withColumnRenamed("actor","hero")
+  // renaming a column
+  val carsWithColumnRenamed = carsDF.withColumnRenamed("Weight_in_lbs", "Weight in pounds")
+
+------------------------------------------------------------------------------------------------------
+drop(columnName1, columnName2)
+------------------------------------------------------------------------------------------------------
+drops the specified columns from the DataFrames
+
+Dropping Two Columns: One Exists and the Other One Doesn’t
+
+scala> df3.printSchema
+root
+ |-- actor: string (nullable = true)
+ |-- title: string (nullable = true)
+ |-- year: integer (nullable = true)
+ 
+scala> val df4 = df3.drop("actor","popular")
+df4: org.apache.spark.sql.DataFrame = [title: string, year: int]
+
+scala> df4.printSchema
+root
+ |-- title: string (nullable = true)
+ |-- year: integer (nullable = true)
+ 
+
+
+
+ 
