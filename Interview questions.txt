@@ -1,0 +1,79 @@
+What is daily volume of the data you received	
+	Its around 30GB to 200GB based on the business happend on that data
+
+What is the source system giving the data and in which format
+	Mostly from JDBC 
+	Other than this we get in csv
+
+What is the landing pad of data:
+	We have different landing pad.
+		Sometimes we get data from S3
+		We use scoop to extract data from JDBC and place in HDFS
+		Mostly its HDFS since we are also using Hive 
+
+What are the different types of metastore of hive ?
+	mysql or derby
+
+What are the types of tables in HIVE ?
+	Managed table and External table
+	
+What are the HIVE optimization techniques ?
+	Partition - based on a column
+	Bucketing - Hash code
+
+What is small file problem in hive and hadoop, how to handle that
+How to overrite the set method to deduplite on a specific field or object
+
+What is === in spark sql
+	The "==" is using the equals methods which checks if the two references point to the same object. 
+	The definition of "===" depends on the context/object. For Spark , "===" is using the equalTo method
+	The $"age" creates a Spark Column object referencing the column named age within in a dataframe. The $ operator is defined in an implicit class StringToColumn
+	
+Will hive support equy join ?
+What is Thrift server in hive?
+	It is a server, which helps to connect HiveServer from outside world
+	For eg: We can access Hive from CLI - this does not require to connect to Thrift
+				When submit a count(*) --> invokes MapReduce
+			We can access Hive from spark using spark.sql(" count(*)") this connect to HiveThrift server to connect to Hive, but run spark job
+			
+
+What is the version you are using in your project - spark and scala
+What is the distribution you are using, Hortnworks, cloudera --> version
+
+Interview Questions:
+
+HIVE:
+Q: Can we do DDL operations in HIVE table.
+	In Hive Update and Delete work based on some limitations
+
+    1.It can only be performed on tables that support ACID.
+    2.If a table is to be used in ACID writes (insert, update, delete) then the table property “transactional” must be set on that table.
+    3.Only ORC file format is supported in this.
+    4.Tables must be bucketed to make use of these features.
+	
+NOTE: HIVE creates Delta files for each Update, Insert and Delete operations. Old data is still available in HDFS until COMPACTION is performed in HIVE
+
+Q: How do you create a dynamic table in HIVE without give create table column specification
+A:
+	Download the data from DB to HDFS using Sqoop in AVRO format
+	Extract schema from .avro data in HDFS using hadoop jar avro-tools-1.8.1.jar getschema /user/hduser/custavro/part-m-00000.avro > /home/hduser/customer.avsc
+	Then create Hive table using the schema
+		create external table customeravro 
+		stored as AVRO 
+		location '/user/hduser/custavro' 
+		TBLPROPERTIES('avro.schema.url'='hdfs:///tmp/customer.avsc');
+		
+
+
+
+
+Sqoop - 2 
+
+How to submit a spark job:
+spark-submit --class <<class name>> <<jar path>> <<jar name>> <<args>> 
+Go to command prompt --> 
+
+spark-submit --class sparkjob.class "D:\BigData\spark-essentials-master\out\artifacts\spark_essentials_jar" spark-essentials.jar
+
+
+

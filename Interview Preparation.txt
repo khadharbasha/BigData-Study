@@ -1,0 +1,84 @@
+Project Preparation:
+Project's main focus is to bring data from all the line of businesses to one central data lake which
+in turn will be used for analytics.
+Currently all the source systems are designed either in RDBMS or Main-Frame. We receive data
+from various different source systems through SFTP or Connect Direct on our Unix server
+
+
+
+https://www.youtube.com/watch?v=BOBIdGf3Tm0 --> Put this as first project
+
+Mainframe --> EBCIDIC --> Transfrom --> CSV --> hive, spark, hdfs
+
+
+
+
+
+
+
+Questions to ifran:
+How do we submit spark job
+What happens if the spark job fails
+How to do you actual developement, what is the developement environment or tools, how the request comes, how do you reploy, what scheduler
+How to schedule the jobs, what is the tools used in production
+How to connect spark to Hbase
+How to they terminate spark streaming
+Do you use putty - how is your actual development tool kit looks like
+How to schedule sqoop jobs 
+
+
+sqoop import \
+--connect jdbc:mysql://localhost/custdb \
+--username root --password root \
+--table customer \
+--target-dir incr \
+--incremental lastmodified \
+--check-column createdt \
+--last-value 2018-10-10 \
+--m 1
+
+
+insert into customer_lastmodified values(13,'inceptez1','tech','hyd',3,'2018-10-11',10000);
+
+
+sqoop import --connect jdbc:mysql://127.0.0.1/custdb --username root --password root \
+--table customer_lastmodified -m 1 \
+--target-dir incrimportlm \
+--incremental lastmodified \
+--check-column upddt \
+--last-value 2018-10-11 --append
+
+
+sqoop import --connect jdbc:mysql://127.0.0.1/custdb --username root --password root --table
+customer_lastmodified -m 1 --target-dir incrimportlm --incremental lastmodified --check-column
+upddt --last-value 2018-10-11 --append
+
+
+sqoop import --connect jdbc:mysql://127.0.0.1/custdb --username root --password root \
+-table customer_lastmodified -m 1 --target-dir incrimportlm \
+--incremental lastmodified --check-column upddt \
+--last-value 2018-10-12 --merge-key custid
+
+
+
+CDC - Change data capture, get only newly inserted row, also called as delta file or increament load
+		--incremental append --check-column <<col>> --last-value (mostly a date)
+
+SCD2 - Slowly changing dimentions 2
+			Get newly inserted rows, get modified rows based on check-column
+			Keeps the history of the data
+		--increament lastmodified --check-column <<col>> --last-value (anything -date or col)
+		
+SCD1 - Slowly changing dimentions 1
+			Get newly inserted rows, get modified rows based on check-column
+			Merge the data with original data, delete the old one. Maintain no history
+		--increament lastmodified --check-column <<col>> --last-value (anything -date or col) --merge-key <<mostly a PK>>
+		*** this invokes a reducer, since the shuffling should happen
+		
+Get 6th top salary:		
+select * from ((select * from stockexchange ORDER BY value DESC limit 6 ) AS T) ORDER BY T.value ASC limit 1;		
+
+Get 2nd top salary:		
+select * from ((select * from stockexchange ORDER BY value DESC limit 2 ) AS T) ORDER BY T.value ASC limit 1;		
+
+select e.id, e.exchang, e.company, e.dt, e.value from stockexchange e where (select count(*) from stockexchange where sal > e.sal) < 3 order by sal desc;
